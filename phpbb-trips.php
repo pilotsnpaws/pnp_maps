@@ -141,7 +141,6 @@ function removeFlightPaths() {
 		</select>
 		
 		<input type="button" onclick="updateTrips()" value="Search"/>
-		<input type="button" onclick="removeFlightPaths()" value="Clear flightPaths"/>
 	</div>
 
     <div id="gMap" style="width:80%;height:600px;"></div>
