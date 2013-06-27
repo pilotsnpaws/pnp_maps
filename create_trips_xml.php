@@ -1,5 +1,16 @@
 <?php
-require("phpsqlajax_dbinfo.php");
+
+// include forum config file for DB info
+include ( "../forum/config.php");
+
+// get DB creds from forum config
+$username=$dbuser;
+$password=$dbpasswd;
+$database=$dbname;
+$server=$dbhost;
+
+// for local testing use below and uncomment above
+// require("phpsqlajax_dbinfo.php");
 
 function parseToXML($htmlStr) 
 { 
