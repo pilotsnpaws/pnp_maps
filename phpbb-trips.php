@@ -38,6 +38,8 @@
 		for (var i = 0; i < trips.length; i++) {
 			var topic = trips[i].getAttribute("topicTitle");
 			var topicID = trips[i].getAttribute("topicID");
+			var lastPost = trips[i].getAttribute("lastPost");
+			var lastPostHuman = trips[i].getAttribute("lastPostHuman");
 			var sendLat = trips[i].getAttribute("sendLat");
 			var sendLon = trips[i].getAttribute("sendLon");
 			var recLat = trips[i].getAttribute("recLat");
@@ -61,7 +63,8 @@
 				strokeWeight: 2,
 				html: '<div style=width:330px;margin:0 0 20px 20px;height:110px;>' + topic + '<BR/>' +  
 					'<a href=http://www.pilotsnpaws.org/forum/viewtopic.php?f=5&amp;t=' + topicID +
-					' target="_blank" >Topic: ' + topicID + '</a>'			
+					' target="_blank" >Topic: ' + topicID + '</a><br>' + 
+					'Last updated: ' + lastPostHuman
 				});
 			
 			flightPaths.push(flightPath);
