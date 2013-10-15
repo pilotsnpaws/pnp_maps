@@ -1,5 +1,10 @@
 <?php
 
+// last updated for production use 2013-08-22  9:17am by Mike Green
+// changes:
+// 2013-08-22 revised underlying vw_lines time conversion to use correct timestamp, resolved bug with not showing posts in the last few hours
+// added parseToXML to all possible strings returned that might contain ampersand or other errant characters
+
 // include forum config file for DB info
 include ( "../forum/config.php");
 
@@ -8,9 +13,6 @@ $username=$dbuser;
 $password=$dbpasswd;
 $database=$dbname;
 $server=$dbhost;
-
-// for local testing use below and uncomment above
-// require("phpsqlajax_dbinfo.php");
 
 function parseToXML($htmlStr) 
 { 
@@ -21,7 +23,6 @@ $xmlStr=str_replace("'",'&#39;',$xmlStr);
 $xmlStr=str_replace("&",'&amp;',$xmlStr); 
 return $xmlStr; 
 } 
-
 
 
 //default the filter to return a year old posts if none provided via URL
@@ -66,13 +67,13 @@ while($row = $result->fetch_assoc()){
   echo 'lastPost="' . $row['last_post'] . '" ';
   echo 'lastPostHuman="' . $row['last_post_human'] . '" ';
   echo 'topicID="' . $row['topic_id'] . '" ';
-  echo 'topicTitle="' . $row['topic_title'] . '" ';
-  echo 'sendZip="' . $row['pnp_sendZip'] . '" ';
-  echo 'sendLat="' . $row['sendLat'] . '" ';
-  echo 'sendLon="' . $row['sendLon'] . '" ';
-  echo 'recZip="' . $row['pnp_recZip'] . '" ';
-  echo 'recLat="' . $row['recLat'] . '" ';
-  echo 'recLon="' . $row['recLon'] . '" ';
+  echo 'topicTitle="' . parseToXML($row['topic_title']) . '" ';
+  echo 'sendZip="' . parseToXML($row['pnp_sendZip']) . '" ';
+  echo 'sendLat="' . parseToXML($row['sendLat']) . '" ';
+  echo 'sendLon="' . parseToXML($row['sendLon']) . '" ';
+  echo 'recZip="' . parseToXML($row['pnp_recZip']) . '" ';
+  echo 'recLat="' . parseToXML($row['recLat']) . '" ';
+  echo 'recLon="' . parseToXML($row['recLon']) . '" ';
   echo '/>';
 }
 

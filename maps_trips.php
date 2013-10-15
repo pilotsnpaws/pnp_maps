@@ -1,5 +1,5 @@
 <!DOCTYPE html >
-  <head>
+<head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org trip request map</title>
@@ -19,6 +19,14 @@
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
 		updateTrips();
+
+		// add options box
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('optionsBox'));
+
+
+		// add legend table
+		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
+
 	}
 
 	function updateTrips() {
@@ -28,7 +36,7 @@
 	lastPostAge = document.getElementById("lastPostAge").value;
 	// alert(lastPostAge);
 	
-	var searchURL = "create_trips_xml.php?lastPostAge=" + lastPostAge;
+	var searchURL = "maps_create_trips_xml.php?lastPostAge=" + lastPostAge;
 	downloadUrl(searchURL, function(data) {
 	var xml = data.responseXML;
 	
@@ -60,8 +68,8 @@
 				path: flightPlanCoordinates,
 				strokeColor: directionColor,
 				strokeOpacity: 1.0,
-				strokeWeight: 2,
-				html: '<div style=width:330px;margin:0 0 20px 20px;height:110px;>' + topic + '<BR/>' +  
+				strokeWeight: 3,
+				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' + topic + '<BR/>' +  
 					'<a href=http://www.pilotsnpaws.org/forum/viewtopic.php?f=5&amp;t=' + topicID +
 					' target="_blank" >Topic: ' + topicID + '</a><br>' + 
 					'Last updated: ' + lastPostHuman
@@ -79,9 +87,13 @@
 
 				// set the info popup content as the html from polyline above
 					pathInfoWindow.setContent(this.html);
-				// we dont need to define setPosition anymore, as we're making the infoWindow with the click's marker location now
 					pathInfoWindow.open(map, marker);
-				  });
+
+					google.maps.event.addListener(map, 'click', function(event) {
+						pathInfoWindow.close(map, marker);
+					} );
+
+				});
 
 			flightPath.setMap(map);	
 			}
@@ -117,8 +129,6 @@ function removeFlightPaths() {
             //routePoints.clear();
     }
 
-
-
 	function doNothing() {}
 	
 	google.maps.event.addDomListener(window, 'load', initialize);
@@ -131,7 +141,27 @@ function removeFlightPaths() {
 
   <body onload="load()">
 
-	<div>
+	<style>
+	html, body {
+		margin:0;
+		padding:0;
+		height:100%; /* needed for container min-height */
+		}	
+		
+	#legend {
+			background: white;
+			padding: 10px;
+			width: 100px;;
+		}
+
+	#optionsBox {
+			background: white;
+			padding: 10px;
+		}		
+		
+	</style>
+
+	<div id="optionsBox">
 		Filter by recent activity:
 		<select id="lastPostAge">
 			<option value="0" selected>Today only</option>
@@ -145,8 +175,16 @@ function removeFlightPaths() {
 		
 		<input type="button" onclick="updateTrips()" value="Search"/>
 	</div>
+	
+	<div id="legend">
+		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
+		<div style="float:left;width:30px;height:1em;background-color:#8D00DE;border: 1px solid black;;"></div>
+		<div style="float:left;padding-left:5px;"> Northbound</div>
+		<div style="float:left;width:30px;height:1em;background-color:#00AD6E;border: 1px solid black;"></div>
+		<div style="float:left;padding-left:5px;"> Southbound</div>
+	</div>
 
-    <div id="gMap" style="width:80%;height:600px;"></div>
+    <div id="gMap" style="width: 100%; height: 100%;"></div>
   </body>
 
 </html>

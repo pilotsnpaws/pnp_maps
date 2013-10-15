@@ -3,8 +3,8 @@ it provides the topic and sending/receiving lat/lon for forum 5, the request for
 */
 create view vw_lines
 AS
-select date_add('1970-01-01', INTERVAL t.topic_last_post_time SECOND ) as last_post,
-    DATE_FORMAT(date_add('1970-01-01', INTERVAL t.topic_last_post_time SECOND )
+select date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) as last_post,
+    DATE_FORMAT(date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND )
         , '%a, %D %b %Y @ %h:%i%p') AS last_post_human,
     t.topic_id, t.topic_title,
     t.pnp_sendZip, z_send.lat as sendLat, z_send.lon as sendLon, t.pnp_recZip, z_rec.lat as recLat, z_rec.lon as recLon
