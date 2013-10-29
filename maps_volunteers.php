@@ -250,8 +250,8 @@ function removeFlightPaths() {
 	<div id="optionsBox">
 		<div>Show: 
 		<input type="radio" name="typesToShow" value="all" checked>Everyone
-		<input type="radio" name="typesToShow" value="pilot">Pilots only
-		<input type="radio" name="typesToShow" value="foster">Fosters only
+		<input type="radio" name="typesToShow" value="pilot">Pilots
+		<input type="radio" name="typesToShow" value="foster">Fosters
 		<input type="radio" name="typesToShow" value="both" >Both foster and fly
 		<input type="radio" name="typesToShow" value="volunteer">Non-foster or flying volunteers
 		<br></div>

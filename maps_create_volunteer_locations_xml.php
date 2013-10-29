@@ -37,10 +37,10 @@ if ($typesToShow == 'both')
 	{ $typesFilterSQL = ' pf_pilot_yn = 1 and pf_foster_yn = 1 ';
 	}
 	elseif ($typesToShow == 'pilot')
-	{ $typesFilterSQL = ' pf_pilot_yn = 1 and pf_foster_yn = 2 ';
+	{ $typesFilterSQL = ' pf_pilot_yn = 1 ';
 	}
 	elseif ($typesToShow == 'foster')
-	{ $typesFilterSQL = ' pf_pilot_yn = 2 and pf_foster_yn = 1';
+	{ $typesFilterSQL = ' pf_foster_yn = 1';
 	}
 	elseif ($typesToShow == 'volunteer')
 	{ $typesFilterSQL = ' pf_pilot_yn = 2 and pf_foster_yn = 2 ';
