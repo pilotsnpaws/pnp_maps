@@ -4,10 +4,13 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org Volunteer Location Map</title>
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false"></script>
+    <script src="markerclusterer.js" type="text/javascript"></script>
     <script type="text/javascript">
     //<![CDATA[
 		
 	var map;
+	var mcOptions;
+	var mc;
 	var flightPaths = [];
 	var lastVisitAge;
 	function initialize() {
@@ -51,6 +54,7 @@
 	var infoWindow = new google.maps.InfoWindow();
 		
 	var volunteers = xml.documentElement.getElementsByTagName("volunteer");
+	
 		for (var i = 0; i < volunteers.length; i++) {
 			var username = volunteers[i].getAttribute("username");
 			var userID = volunteers[i].getAttribute("userID");
@@ -105,58 +109,53 @@
 			flightPaths.push(volunteerMarker);
 
 			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
-			// get the click's latlng and use that as anchor for infoWindow
-				var marker = new google.maps.Marker({
-					position: event.latLng
-					}); 
-				
-			// set the info popup content as the html from polyline above, then open it
-				infoWindow.setContent(this.html);
-				infoWindow.open(map, marker);
-				
-			// setup the flying radius
-			var circleOptions = {
-				strokeColor: 'blue',
-				strokeOpacity: 0.5, 
-				fillColor: 'green',
-				fillOpacity: 0.2,
-				map: map,
-				center: event.latLng,
-				radius: this.radius
-			} ;			
-				
-			var flyingCircle = new google.maps.Circle(circleOptions);				
+				// get the click's latlng and use that as anchor for infoWindow
+					var marker = new google.maps.Marker({
+						position: event.latLng
+						}); 
+					
+				// set the info popup content as the html from polyline above, then open it
+					infoWindow.setContent(this.html);
+					infoWindow.open(map, marker);
+					
+				// setup the flying radius
+				var circleOptions = {
+					strokeColor: 'blue',
+					strokeOpacity: 0.5, 
+					fillColor: 'green',
+					fillOpacity: 0.2,
+					map: map,
+					center: event.latLng,
+					radius: this.radius
+				} ;			
+					
+				var flyingCircle = new google.maps.Circle(circleOptions);				
 
-			google.maps.event.addListener(map, 'click', function(event) {
-				flyingCircle.setMap(null) ; 
-				infoWindow.close(map, marker);
-				} );
-			google.maps.event.addListener(flyingCircle, 'click', function(event) {
-				flyingCircle.setMap(null) ; 
-				infoWindow.close(map, marker);
-				} );
-
-
-			} ) ;
+				google.maps.event.addListener(map, 'click', function(event) {
+					flyingCircle.setMap(null) ; 
+					infoWindow.close(map, marker);
+					} );
+				google.maps.event.addListener(flyingCircle, 'click', function(event) {
+					flyingCircle.setMap(null) ; 
+					infoWindow.close(map, marker);
+					} );
 
 
-		// not using hover to see infoWindows at this point
-		//	google.maps.event.addListener(volunteerMarker, 'mouseover', function() {
-		//		var marker = new google.maps.Marker({
-		//			position: event.latLng
-		//			}); 
-		//		infoWindow.setContent(this.html);
-		//		infoWindow.open(map, this);
-		//		});
-		//		
-		//	google.maps.event.addListener(volunteerMarker, 'mouseout', function() {
-		//		infoWindow.close();
-		//		});
+				} ) ;
 
-			volunteerMarker.setMap(map);	
-			}
-		});
-	}
+			//volunteerMarker.setMap(map);	
+
+			} // end of for
+
+		//  testing cluster
+		var mcOptions = {
+			gridSize: 50, 
+			maxZoom: 9};
+		var mc = new MarkerClusterer(map, flightPaths, mcOptions);
+
+		});  
+	}  // end updateVolunteers
+
 
 
 
@@ -199,7 +198,7 @@ function removeFlightPaths() {
 
   </head>
 
-  <body>
+  <body >
 
 	<style>
 	html, body {
@@ -269,9 +268,6 @@ function removeFlightPaths() {
 	</div>
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
-    
-  
-  
   </body>
 
 </html>

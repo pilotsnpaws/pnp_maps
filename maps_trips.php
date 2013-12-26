@@ -170,7 +170,7 @@ function removeFlightPaths() {
 			<option value="7">In the last 7 days</option>
 			<option value="14">In the last 14 days</option>
 			<option value="30">In the last 30 days</option>
-			<option value="365">Last year</option>
+			<option value="365">Last 12 months</option>
 		</select>
 		
 		<input type="button" onclick="updateTrips()" value="Search"/>
