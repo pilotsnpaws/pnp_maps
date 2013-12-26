@@ -8,8 +8,8 @@ select /* 12/26/2013 update MJG */
         , '%a, %D %b %Y @ %h:%i%p') AS last_visit_human
         ,u.user_id, u.user_regdate, u.username, pf.pf_flying_radius, pf.pf_foster_yn, pf.pf_pilot_yn,
         pf.pf_airport_id as apt_id, a.apt_name,  pf.pf_zip_code as zip,
-        coalesce(z.lat, a.lat) as lat, coalesce(z.lon, a.lon) as lon, 
-        coalesce(z.city, a.city) as city, coalesce(z.state,z.state) as state
+        coalesce(a.lat, z.lat) as lat, coalesce(a.lon, z.lon) as lon, 
+        coalesce(a.city, z.city) as city, coalesce(a.state,z.state) as state
 from phpbb_users u
     join phpbb_profile_fields_data pf on u.user_id = pf.user_id
     left outer join airports a on a.apt_id = pf.pf_airport_id 
