@@ -1,6 +1,7 @@
 create view vw_volunteers
 as
-select date_add('1969-12-31 20:00:00', INTERVAL 
+select /* 12/26/2013 update MJG */
+	date_add('1969-12-31 20:00:00', INTERVAL 
         greatest(u.user_regdate, u.user_lastvisit, u.user_lastmark, u.user_lastpost_time, u.user_last_search)
         SECOND ) as last_visit,
     DATE_FORMAT(date_add('1969-12-31 20:00:00', INTERVAL u.user_lastvisit SECOND )
@@ -16,3 +17,4 @@ from phpbb_users u
     left outer join zipcodes z on z.zip = pf.pf_zip_code
 where 1=1
     and not (pf.pf_airport_id = '' and pf.pf_zip_code = '') /* exclude users who didnt provide airport or zip code */ 
+    and u.user_inactive_reason = 0 /* added 12/26/2013 to exclude inactive users */
