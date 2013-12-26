@@ -4,13 +4,10 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org Volunteer Location Map</title>
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false"></script>
-    <script src="markerclusterer.js" type="text/javascript"></script>
     <script type="text/javascript">
     //<![CDATA[
 		
 	var map;
-	var mcOptions;
-	var mc;
 	var flightPaths = [];
 	var lastVisitAge;
 	function initialize() {
@@ -57,7 +54,6 @@
 	var infoWindow = new google.maps.InfoWindow();
 		
 	var volunteers = xml.documentElement.getElementsByTagName("volunteer");
-	
 		for (var i = 0; i < volunteers.length; i++) {
 			var username = volunteers[i].getAttribute("username");
 			var userID = volunteers[i].getAttribute("userID");
@@ -100,7 +96,7 @@
 				position: volunteerCoordinates,
 				radius: flyingRadius * 1852, // 1852 meters in a nautical mile
 				icon: markerImage,
-				optimized: false,
+				optimized: false,				
 				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
 					'Username: <a href=http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' + userID +
 					' target="_blank" >' + username + '</a> <br>' + 
@@ -113,53 +109,58 @@
 			flightPaths.push(volunteerMarker);
 
 			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
-				// get the click's latlng and use that as anchor for infoWindow
-					var marker = new google.maps.Marker({
-						position: event.latLng
-						}); 
-					
-				// set the info popup content as the html from polyline above, then open it
-					infoWindow.setContent(this.html);
-					infoWindow.open(map, marker);
-					
-				// setup the flying radius
-				var circleOptions = {
-					strokeColor: 'blue',
-					strokeOpacity: 0.5, 
-					fillColor: 'green',
-					fillOpacity: 0.2,
-					map: map,
-					center: event.latLng,
-					radius: this.radius
-				} ;			
-					
-				var flyingCircle = new google.maps.Circle(circleOptions);				
+			// get the click's latlng and use that as anchor for infoWindow
+				var marker = new google.maps.Marker({
+					position: event.latLng
+					}); 
+				
+			// set the info popup content as the html from polyline above, then open it
+				infoWindow.setContent(this.html);
+				infoWindow.open(map, marker);
+				
+			// setup the flying radius
+			var circleOptions = {
+				strokeColor: 'blue',
+				strokeOpacity: 0.5, 
+				fillColor: 'green',
+				fillOpacity: 0.2,
+				map: map,
+				center: event.latLng,
+				radius: this.radius
+			} ;			
+				
+			var flyingCircle = new google.maps.Circle(circleOptions);				
 
-				google.maps.event.addListener(map, 'click', function(event) {
-					flyingCircle.setMap(null) ; 
-					infoWindow.close(map, marker);
-					} );
-				google.maps.event.addListener(flyingCircle, 'click', function(event) {
-					flyingCircle.setMap(null) ; 
-					infoWindow.close(map, marker);
-					} );
+			google.maps.event.addListener(map, 'click', function(event) {
+				flyingCircle.setMap(null) ; 
+				infoWindow.close(map, marker);
+				} );
+			google.maps.event.addListener(flyingCircle, 'click', function(event) {
+				flyingCircle.setMap(null) ; 
+				infoWindow.close(map, marker);
+				} );
 
 
-				} ) ;
+			} ) ;
 
-			//volunteerMarker.setMap(map);	
 
-			} // end of for
+		// not using hover to see infoWindows at this point
+		//	google.maps.event.addListener(volunteerMarker, 'mouseover', function() {
+		//		var marker = new google.maps.Marker({
+		//			position: event.latLng
+		//			}); 
+		//		infoWindow.setContent(this.html);
+		//		infoWindow.open(map, this);
+		//		});
+		//		
+		//	google.maps.event.addListener(volunteerMarker, 'mouseout', function() {
+		//		infoWindow.close();
+		//		});
 
-		//  testing cluster
-		var mcOptions = {
-			gridSize: 50, 
-			maxZoom: 9};
-		var mc = new MarkerClusterer(map, flightPaths, mcOptions);
-
-		});  
-	}  // end updateVolunteers
-
+			volunteerMarker.setMap(map);	
+			}
+		});
+	}
 
 
 
@@ -202,7 +203,7 @@ function removeFlightPaths() {
 
   </head>
 
-  <body >
+  <body>
 
 	<style>
 	html, body {
@@ -222,10 +223,7 @@ function removeFlightPaths() {
 	#optionsBox {
 			background: white;
 			padding: 10px;
-			border-style: solid;
-			border-color: black;
-			border-width:2px;	
-		}
+		}	
 		
 	#clusterNotif {
 			background: white;
@@ -233,16 +231,15 @@ function removeFlightPaths() {
 			border-style: solid;
 			border-color: black;
 			border-width:2px;	
-		}
-	
-	
+		}		
 	</style>
+
 
 	<div id="clusterNotif">
 	<table>
 		<tr valign="bottom" align="center">
 			<td >
-				<A href="maps_volunteers_noncluster.php">Take me back to the old (non-clustered) map.</A>
+				<A href="maps_volunteers.php">Take me to the clustered (new) map.</A>
 			</td>
 		</tr>
 	</table>
@@ -295,6 +292,9 @@ function removeFlightPaths() {
 	</div>
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
+    
+  
+  
   </body>
 
 </html>
