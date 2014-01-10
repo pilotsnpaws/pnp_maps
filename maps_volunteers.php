@@ -13,6 +13,10 @@
 	var mc;
 	var flightPaths = [];
 	var lastVisitAge;
+
+	var min = .999965;
+	var max = 1.000035;
+	
 	function initialize() {
 		var mapOptions = {
 			zoom: 4,
@@ -69,11 +73,11 @@
 			var airportID = volunteers[i].getAttribute("airportID");
 			var airportName = volunteers[i].getAttribute("airportName");
 			var zip = volunteers[i].getAttribute("zip");
-			var lat = volunteers[i].getAttribute("lat");
-			var lon = volunteers[i].getAttribute("lon");
+			var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
+			var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
 			var city = volunteers[i].getAttribute("city");
 			var state = volunteers[i].getAttribute("state");
-			var volunteerCoordinates = new google.maps.LatLng(lat, lon);
+			var volunteerCoordinates = new google.maps.LatLng(lat,lon);
 
 			// is volunteer a foster or pilot, both, or neither?
 			// both foster and pilot
