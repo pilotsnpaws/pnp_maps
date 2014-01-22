@@ -1,5 +1,13 @@
 <?php
 
+	//no  cache headers 
+	header("Expires: Mon, 26 Jul 1990 05:00:00 GMT");
+	header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+	header("Cache-Control: no-store, no-cache, must-revalidate");
+	header("Cache-Control: post-check=0, pre-check=0", false);
+	header("Pragma: no-cache");
+
+
 // include forum config file for DB info
 include ( "../forum/config.php");
 
@@ -78,7 +86,7 @@ echo '<volunteers>';
 
 // Iterate through the rows, printing XML nodes for each
 
-$row = $result->fetch_assoc();
+// $row = $result->fetch_assoc(); --if left then will not include first row
 while($row = $result->fetch_assoc()){
   // ADD TO XML DOCUMENT NODE
   echo '<volunteer ';

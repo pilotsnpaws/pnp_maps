@@ -60,7 +60,7 @@ echo '<trips>';
 
 // Iterate through the rows, printing XML nodes for each
 
-$row = $result->fetch_assoc();
+// $row = $result->fetch_assoc(); --if left then will not include first row
 while($row = $result->fetch_assoc()){
   // ADD TO XML DOCUMENT NODE
   echo '<trip ';
