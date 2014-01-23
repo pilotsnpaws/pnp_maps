@@ -43,6 +43,10 @@
 		// add legend table
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
 
+		// add beta info table
+		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('beta'));
+
+
 	}
 
 	function get_checked_radio(radios) {
@@ -354,6 +358,14 @@ function removeFlightPaths() {
 			border-color: black;
 			border-width:2px;	
 		}
+	#beta {
+			background: white;
+			padding: 5px;
+			
+			border-style: solid;
+			border-color: black;
+			border-width:2px;	
+		}
 
 
 	</style>
@@ -365,7 +377,7 @@ function removeFlightPaths() {
 
 	<div id="legend">
 		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
-		<div style="float:left;width:30px;height:1em;background-color:#8D00DE;border: 1px solid black;;"></div>
+		<div style="float:left;width:30px;height:1em;background-color:#8D00DE;border: 1px solid black;"></div>
 		<div style="float:left;padding-left:5px;"> Northbound</div>
 		<div style="float:left;width:30px;height:1em;background-color:#00AD6E;border: 1px solid black;"></div>
 		<div style="float:left;padding-left:5px;"> Southbound</div>
@@ -403,6 +415,12 @@ function removeFlightPaths() {
 		
 		<input type="button" onclick="updateVolunteers()" value="Search"/>
 	</div>
+	
+	<div id="beta" >
+		<div style="margin-bottom:5px;font-weight:500;">This map is still under development!</div>
+		<div> Please submit your feedback <a href="http://www.pilotsnpaws.org/forum/viewtopic.php?f=17&t=26362" target="_blank" >here</a> </div>
+		<div>Note: This map currently only shows volunteers within the <br> distance around the starting and ending points of the request.   <br>You can expand those circles using the "Radius to show" setting above.</div>
+	</div>	
 
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
