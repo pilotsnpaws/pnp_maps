@@ -1,46 +1,48 @@
 <!DOCTYPE html >
-  <head>
+<head> 
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Pilotsnpaws.org Volunteer Location Map</title>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false"></script>
-    <script src="markerclusterer.js" type="text/javascript"></script>
+    <title>Pilotsnpaws.org single trip map</title>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false&v=3&libraries=geometry"></script>
     <script type="text/javascript">
     //<![CDATA[
 		
 	var map;
-	var mcOptions;
 	var flightPaths = [];
-	var lastVisitAge;
-	var typeToShow;
-	var zipCode = "00000";
-	var distance;
-
+	var volunteerMarkers = [];
+	var topic;
 	var min = .999965;
-	var max = 1.000035;
-	
+	var max = 1.000035;	
+	var sendZip = '00000';
+	var recZip = '00000' ;
+
+	function gup( name ){
+		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
+		var regexS = "[\\?&]"+name+"=([^&#]*)";  
+		var regex = new RegExp( regexS );  
+		var results = regex.exec( window.location.href ); 
+		 if( results == null )    return "";  
+		else    return results[1];}
+
 	function initialize() {
 		var mapOptions = {
-			zoom: 5,
-			center: new google.maps.LatLng(37.000000,-95.000000),
+			zoom: 4,
+			center: new google.maps.LatLng(37.000000,-95.000000), // need to zoom to just trip 
 			scaleControl: true,
 			mapTypeId: google.maps.MapTypeId.ROADMAP
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
-
-		mc = new MarkerClusterer(map);
-
-		updateVolunteers();
-
+		updateTrips();
+		
 		// add options box
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('optionsBox'));
+
+		// add trip details table
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('details'));
 
 		// add legend table
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
 
-		// add legend table
-		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('clusterNotif'));
-		
 	}
 
 	function get_checked_radio(radios) {
@@ -52,18 +54,126 @@
 	    }
 	}
 
-	function updateVolunteers() {
+	function updateTrips() {
+
+	removeFlightPaths();
+
+	//topic = document.getElementById("topic").value;
+	// alert(topic);
 	
-	lastVisitAge = document.getElementById("lastVisitAge").value;
-	typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
-	zipCode = document.getElementById("zipCode").value;
-	distance = document.getElementById("distance").value;
-	
-	var searchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + zipCode + "&distance=" + distance ;
-	//alert(searchURL);
+	var topic_param = gup('topic');
+	var searchURL = "maps_create_single_trip_xml.php?topic=" + topic_param;
 	downloadUrl(searchURL, function(data) {
 	var xml = data.responseXML;
 	
+	var pathInfoWindow = new google.maps.InfoWindow();
+		
+	var trips = xml.documentElement.getElementsByTagName("trip");
+		for (var i = 0; i < trips.length; i++) {
+			var topic = trips[i].getAttribute("topicTitle");
+			var topicID = trips[i].getAttribute("topicID");
+			var lastPost = trips[i].getAttribute("lastPost");
+			var lastPostHuman = trips[i].getAttribute("lastPostHuman");
+			var sendLat = trips[i].getAttribute("sendLat");
+			var sendLon = trips[i].getAttribute("sendLon");
+			var recLat = trips[i].getAttribute("recLat");
+			var recLon = trips[i].getAttribute("recLon");
+			sendZip = trips[i].getAttribute("sendZip");
+			recZip = trips[i].getAttribute("recZip");
+			var sendCity = trips[i].getAttribute("sendCity");
+			var recCity = trips[i].getAttribute("recCity");
+			var flightPlanCoordinates = [
+				new google.maps.LatLng(sendLat, sendLon),
+				new google.maps.LatLng(recLat, recLon),
+				];
+			if (sendLat < recLat) 
+					// south to north trip
+					{ var directionColor = '#8D00DE' ; // purple
+					}
+				else  // north to south trip
+					{ var directionColor = '#00AD6E'; // greenish
+					}
+			
+			var flightPath = new google.maps.Polyline({
+				path: flightPlanCoordinates,
+				strokeColor: directionColor,
+				strokeOpacity: 1.0,
+				strokeWeight: 3,
+				});
+
+			flightPaths.push(flightPath);
+
+			// from http://stackoverflow.com/questions/16642451/center-and-auto-zoom-google-map
+			//  Make an array of the LatLng's of the markers you want to show
+			var LatLngList = new Array (new google.maps.LatLng(sendLat, sendLon), new google.maps.LatLng(recLat, recLon));
+			//  Create a new viewpoint bound
+			var bounds = new google.maps.LatLngBounds ();
+			//  Go through each...
+			for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
+			  //  And increase the bounds to take this point
+			  bounds.extend (LatLngList[i]);
+				}
+			//  Fit these bounds to the map
+			map.fitBounds (bounds);
+
+			// do length calcs, make a dummy path to get length.. if not, cant calc length in the html string below
+			var lengthFlightPath = new google.maps.Polyline({
+				path: flightPlanCoordinates
+				});
+			var lengthMeters = google.maps.geometry.spherical.computeLength(lengthFlightPath.getPath())  ;
+			var lengthMiles = Math.round(lengthMeters / 1609.344);
+			var lengthNM = Math.round(lengthMeters / 1852);
+
+			var strHTML = '<a href=http://www.pilotsnpaws.org/forum/viewtopic.php?f=5&amp;t=' + topicID +
+					' target="_blank" >' + topic + '</a><br>' + 
+					'From ' + sendCity + ' to ' + recCity + '<br>' + 
+					'Distance: ' + lengthMiles + ' miles / ' + lengthNM  + ' nm' + '<br>' + 
+					'Topic last updated: ' + lastPostHuman
+
+			// update the html window with trip details
+			document.getElementById("tripHTML").innerHTML = strHTML;
+			// document.getElementById("zipCode").value = sendZip;
+
+				google.maps.event.addListener(flightPath, 'click', function(event) {
+									
+				// get the click's latlng and use that as anchor for infoWindow
+				// found here: http://stackoverflow.com/questions/9998003/calling-infowindow-w-google-map-v3-api
+					var marker = new google.maps.Marker({
+						position: event.latLng
+						}); 
+
+				// set the info popup content as the html from polyline above
+					pathInfoWindow.setContent(this.html);
+					pathInfoWindow.open(map, marker);
+
+					google.maps.event.addListener(map, 'click', function(event) {
+						pathInfoWindow.close(map, marker);
+					} );
+
+				});
+
+			flightPath.setMap(map);	
+			updateVolunteers();
+			}
+		});
+	}
+		
+
+	function updateVolunteers() {
+	
+	removeVolunteers();
+	
+	// get volunteer data
+	lastVisitAge = document.getElementById("lastVisitAge").value;
+	typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
+	//zipCode = sendZip; // document.getElementById("zipCode").value;
+	distance = document.getElementById("distance").value;
+	
+	var volSearchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + sendZip + ',' + recZip + "&distance=" + distance ;
+	
+	downloadUrl(volSearchURL, function(data) {
+	var xml = data.responseXML
+
 	var infoWindow = new google.maps.InfoWindow();
 		
 	var volunteers = xml.documentElement.getElementsByTagName("volunteer");
@@ -120,7 +230,7 @@
 					'</div> ' 
 				});
 
-			flightPaths.push(volunteerMarker);
+			volunteerMarkers.push(volunteerMarker);
 			
 			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
 				// get the click's latlng and use that as anchor for infoWindow
@@ -155,17 +265,13 @@
 					} );
 
 				} ) ;
+			volunteerMarker.setMap(map);	
 
 			} // end of for
-
-		//  testing cluster
-		var mcOptions = {
-			gridSize: 50, 
-			maxZoom: 9};
-		mc = new MarkerClusterer(map, flightPaths, mcOptions);
-
-		});  
-	}  // end updateVolunteers
+			
+		});  	
+	// end updateVolunteers
+	}
 
 	function downloadUrl(url, callback) {
 		var request = window.ActiveXObject ?
@@ -183,23 +289,30 @@
 		request.send(null);
 	}
 
+// got this from http://stackoverflow.com/questions/9058911/cant-remove-mvcarray-polylines-using-google-maps-api-v3
+function removeFlightPaths() {
+           for (var i=0; i < flightPaths.length; i++) {
+                flightPaths[i].setMap(null);
+            }
+
+            // you probably then want to empty out your array as well
+            flightPaths = [];
+
+            // not sure you'll require this at this point, but if you want to also clear out your array of coordinates...
+            //routePoints.clear();
+    }
+    
+    function removeVolunteers() {
+           for (var i=0; i < volunteerMarkers.length; i++) {
+                volunteerMarkers[i].setMap(null);
+            }
+
+            // you probably then want to empty out your array as well
+            volunteerMarkers = [];
+    }
+
 	function doNothing() {}
-
-// Deletes all markers in the array by removing references to them.
-function deleteMarkers() {
-  //alert(mc);
-  setAllMap(null);
-  flightPaths = [];
-  mc.clearMarkers();
-}
-
-  // Sets the map on all markers in the array.
-function setAllMap(map) {
-  for (var i = 0; i < flightPaths.length; i++) {
-	flightPaths[i].setMap(null);
-  }
-}
-
+	
 	google.maps.event.addDomListener(window, 'load', initialize);
 
     //]]>
@@ -208,7 +321,7 @@ function setAllMap(map) {
 
   </head>
 
-  <body >
+  <body onload="load()">
 
 	<style>
 	html, body {
@@ -220,10 +333,19 @@ function setAllMap(map) {
 	#legend {
 			background: white;
 			padding: 5px;
+			width: 100px;
 			border-style: solid;
 			border-color: black;
 			border-width:2px;	
 		}
+
+	#details {
+			background: white;
+			padding: 5px;
+			border-style: solid;
+			border-color: black;
+			border-width:2px;	
+		}		
 
 	#optionsBox {
 			background: white;
@@ -232,52 +354,22 @@ function setAllMap(map) {
 			border-color: black;
 			border-width:2px;	
 		}
-		
-	#clusterNotif {
-			background: white;
-			padding: 10px;
-			border-style: solid;
-			border-color: black;
-			border-width:2px;	
-		}
-	
-	
+
+
 	</style>
 
-	<div id="clusterNotif">
-	<table>
-		<tr valign="bottom" align="center">
-			<td >
-				<A href="maps_volunteers_noncluster.php">Take me back to the old (non-clustered) map.</A>
-			</td>
-		</tr>
-	</table>
+	<div id="details">
+		<div style="font-weight:500;font-size:140%">Trip request details:</div>
+		<div style="font-size:135%" id="tripHTML"></div>
 	</div>
 
 	<div id="legend">
-	<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
-	<table>
-		<tr valign="bottom" align="center">
-			<td >
-				<img src="images/icon_plane_house_small.svg" >
-				<div style="padding-left:5px;"> Foster/Pilot</div>
-			</td>
-			<td>
-				<img src="images/icon_house_small.svg" >
-				<div style="padding-left:5px;"> Foster</div>
-			</td>
-			<td>
-				<img src="images/icon_plane_blue_small.svg" >
-				<div style="padding-left:5px;"> Pilot</div>
-			</td>
-			<td>
-				<img src="images/icon_volunteer.svg" >
-				<div style="padding-left:5px;"> Volunteer</div>
-			</td>
-		</tr>
-	</table>
+		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
+		<div style="float:left;width:30px;height:1em;background-color:#8D00DE;border: 1px solid black;;"></div>
+		<div style="float:left;padding-left:5px;"> Northbound</div>
+		<div style="float:left;width:30px;height:1em;background-color:#00AD6E;border: 1px solid black;"></div>
+		<div style="float:left;padding-left:5px;"> Southbound</div>
 	</div>
-
 
 	<div id="optionsBox">
 		<div>Show: 
@@ -297,20 +389,21 @@ function setAllMap(map) {
 			<option value="3650">Show me all volunteers</option>
 		</select>
 		<br>
-		Search for pilots: <input id="zipCode" type='text' maxlength="5" size="7" placeholder="Zip Code"/>  Radius to show:  
+		Radius to show:  
 			<select id="distance">
-				<option selected="selected"> </option>
+				<option > </option>
 				<option value="10" >10 miles</option>
 				<option value="30" >30 miles</option>
-				<option value="50" >50 miles</option>
+				<option selected="selected" value="50" >50 miles</option>
 				<option value="100">100 miles</option>
 				<option value="150">150 miles</option>
 				<option value="200">200 miles</option>
 			</select>
 		
 		
-		<input type="button" onclick="deleteMarkers();updateVolunteers()" value="Search"/>
+		<input type="button" onclick="updateVolunteers()" value="Search"/>
 	</div>
+
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
   </body>

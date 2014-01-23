@@ -28,10 +28,14 @@ return $xmlStr;
 } 
 
 //default the filters if none provided via URL
-$lastVisitAge = 365;
+$lastVisitAge = 180;
 $typesToShow = 'all' ; 
+$airportCode = 'KMGY' ;
+// $zipCode = 'none'; 
+$distance = 10 ;
 
 $typesFilterSQL = ' 1=1 ' ;
+$distanceFilterSQL = ' 1=1 ' ;
 
 // Get parameters from URL
 if (isset($_GET['lastVisitAge'])){
@@ -40,6 +44,32 @@ if (isset($_GET['lastVisitAge'])){
 if (isset($_GET['typesToShow'])){
 	$typesToShow= $_GET["typesToShow"];
 	}
+if (isset($_GET['zipCode'])){
+	$zipCode= $_GET["zipCode"];
+	}
+	else
+	{ $zipCode = '' ;
+	}
+if (isset($_GET['distance'])){
+	$distance= $_GET["distance"];
+	}
+
+if ($zipCode == ''){
+	$zipCode = 'foo';
+	} 
+	else
+	{	$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, '
+		. ' ( 3959 * acos( cos( radians(b.lat) ) * cos( radians( a.lat ) ) * cos( radians( a.lon ) - radians(b.lon) ) '
+		. ' + sin( radians(b.lat) ) * sin( radians( a.lat ) ) ) ) AS distance '
+		. ' FROM airports a, '
+		. ' (select zip, lat, lon from zipcodes where zip in ( ' 
+		. $zipCode
+		. ' ) ) b '
+		. ' HAVING distance < '
+		. $distance
+		. ' ) z ) ' ;
+	} 
+
 
 if ($typesToShow == 'both')
 	{ $typesFilterSQL = ' pf_pilot_yn = 1 and pf_foster_yn = 1 ';
@@ -57,7 +87,7 @@ if ($typesToShow == 'both')
 	{ $typesFilterSQL = ' 1=1 ';
 	}
 	;
-
+	
 // define mysqli connection
 $mysqli = new mysqli($server, $username, $password, $database);
  
@@ -75,7 +105,9 @@ $query = 'select last_visit, last_visit_human, user_id, username, pf_foster_yn, 
 		. ' and last_visit > date_add(cast(current_date as datetime), INTERVAL -'
 		. $lastVisitAge 
 		. ' DAY) and ' 
-		. $typesFilterSQL ;
+		. $typesFilterSQL 
+		. 'and '
+		. $distanceFilterSQL ;
 
 //echo $query;
 $result = $mysqli->query($query);

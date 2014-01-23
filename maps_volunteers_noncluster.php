@@ -106,7 +106,7 @@
 					'</div> ' 
 				});
 		
-			flightPaths.push(volunteerMarker);
+			//flightPaths.push(volunteerMarker);
 
 			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
 			// get the click's latlng and use that as anchor for infoWindow
@@ -143,6 +143,7 @@
 
 			} ) ;
 
+			volunteerMarker.setMap(map);
 
 		// not using hover to see infoWindows at this point
 		//	google.maps.event.addListener(volunteerMarker, 'mouseover', function() {
@@ -239,7 +240,7 @@ function removeFlightPaths() {
 	<table>
 		<tr valign="bottom" align="center">
 			<td >
-				<A href="maps_volunteers.php">Take me to the clustered (new) map.</A>
+				<A href="maps_volunteers_cluster.php">Take me to the clustered (new) map.</A>
 			</td>
 		</tr>
 	</table>
