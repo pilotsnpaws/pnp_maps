@@ -98,7 +98,7 @@
 				icon: markerImage,
 				optimized: false,				
 				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
-					'Username: <a href=http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' + userID +
+					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
 					' target="_blank" >' + username + '</a> <br>' + 
 					' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
 					pilotInfo + 

@@ -128,7 +128,7 @@
 			var lengthMiles = Math.round(lengthMeters / 1609.344);
 			var lengthNM = Math.round(lengthMeters / 1852);
 
-			var strHTML = '<a href=http://www.pilotsnpaws.org/forum/viewtopic.php?f=5&amp;t=' + topicID +
+			var strHTML = '<a href=/forum/viewtopic.php?f=5&amp;t=' + topicID +
 					' target="_blank" >' + topic + '</a><br>' + 
 					'From ' + sendCity + ' to ' + recCity + '<br>' + 
 					'Distance: ' + lengthMiles + ' miles / ' + lengthNM  + ' nm' + '<br>' + 
@@ -226,7 +226,7 @@
 				icon: markerImage,
 				optimized: false,
 				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
-					'Username: <a href=http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' + userID +
+					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
 					' target="_blank" >' + username + '</a> <br>' + 
 					' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
 					pilotInfo + 
@@ -418,7 +418,7 @@ function removeFlightPaths() {
 	
 	<div id="beta" >
 		<div style="margin-bottom:5px;font-weight:500;">This map is still under development!</div>
-		<div> Please submit your feedback <a href="http://www.pilotsnpaws.org/forum/viewtopic.php?f=17&t=26362" target="_blank" >here</a> </div>
+		<div> Please submit your feedback <a href="/forum/viewtopic.php?f=17&t=26362" target="_blank" >here</a> </div>
 		<div>Note: This map currently only shows volunteers within the <br> distance around the starting and ending points of the request.   <br>You can expand those circles using the "Radius to show" setting above.</div>
 	</div>	
 

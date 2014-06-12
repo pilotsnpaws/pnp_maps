@@ -76,7 +76,7 @@
 			var lengthMiles = Math.round(lengthMeters / 1609.344);
 			var lengthNM = Math.round(lengthMeters / 1852);
 
-			var strHTML = '<a href=http://www.pilotsnpaws.org/forum/viewtopic.php?f=5&amp;t=' + topicID +
+			var strHTML = '<a href=/forum/viewtopic.php?f=5&amp;t=' + topicID +
 					' target="_blank" >' + topic + '</a><br>' + 
 					'From ' + sendCity + ' to ' + recCity + '<br>' + 
 					'Distance: ' + lengthMiles + ' miles / ' + lengthNM  + ' nm' + '<br>' + 

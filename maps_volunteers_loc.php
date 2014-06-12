@@ -152,7 +152,7 @@
 				icon: markerImage,
 				optimized: false,
 				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
-					'Username: <a href=http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' + userID +
+					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
 					' target="_blank" >' + username + '</a> <br>' + 
 					' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
 					pilotInfo + 
@@ -303,7 +303,7 @@
 		</tr>
 		<tr valign="bottom" align="left">
 			<td >
-				<A href="http://www.pilotsnpaws.org/forum/viewforum.php?f=17">Take me to the tech support forum.</A>
+				<A href="/forum/viewforum.php?f=17">Take me to the tech support forum.</A>
 			</td>
 		</tr>
 	</table>
