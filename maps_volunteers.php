@@ -125,7 +125,8 @@
 			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
 				// get the click's latlng and use that as anchor for infoWindow
 					var marker = new google.maps.Marker({
-						position: event.latLng
+						position: event.latLng,
+						map: map
 						}); 
 					
 				// set the info popup content as the html from polyline above, then open it
