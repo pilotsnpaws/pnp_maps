@@ -44,7 +44,7 @@
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
 
 		// add beta info table
-		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('beta'));
+		//map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('beta'));
 
 
 	}
@@ -416,12 +416,12 @@ function removeFlightPaths() {
 		<input type="button" onclick="updateVolunteers()" value="Search"/>
 	</div>
 	
-	<div id="beta" >
+<!--	<div id="beta" >
 		<div style="margin-bottom:5px;font-weight:500;">This map is still under development!</div>
 		<div> Please submit your feedback <a href="/forum/viewtopic.php?f=17&t=26362" target="_blank" >here</a> </div>
 		<div>Note: This map currently only shows volunteers within the <br> distance around the starting and ending points of the request.   <br>You can expand those circles using the "Radius to show" setting above.</div>
 	</div>	
-
+-->Ã
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
   </body>

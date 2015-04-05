@@ -97,7 +97,8 @@
 			// get the click's latlng and use that as anchor for infoWindow
 			// found here: http://stackoverflow.com/questions/9998003/calling-infowindow-w-google-map-v3-api
 				var marker = new google.maps.Marker({
-				position: event.latLng
+				position: event.latLng,
+				map: map
 				}); 
 
 			// set the info popup content as the html from polyline above
