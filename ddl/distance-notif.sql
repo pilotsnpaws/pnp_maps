@@ -31,6 +31,3 @@ and
    * cos( radians( sendzip.lat ) ) 
    * cos( radians(sendzip.lon) - radians(reczip.lon)) + sin(radians(reczip.lat)) 
    * sin( radians(sendzip.lat)))) < 1000
-
-
--- select MBRContains();
