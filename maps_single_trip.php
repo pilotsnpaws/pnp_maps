@@ -423,7 +423,7 @@ function removeFlightPaths() {
 		<div> Please submit your feedback <a href="/forum/viewtopic.php?f=17&t=26362" target="_blank" >here</a> </div>
 		<div>Note: This map currently only shows volunteers within the <br> distance around the starting and ending points of the request.   <br>You can expand those circles using the "Radius to show" setting above.</div>
 	</div>	
--->Ã
+-->
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
   </body>
