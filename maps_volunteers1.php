@@ -5,6 +5,7 @@
     <title>Pilotsnpaws.org Volunteer Location Map</title>
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false"></script>
     <script src="markerclusterer.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script type="text/javascript">
     //<![CDATA[
 		
@@ -24,6 +25,7 @@
 			zoom: 5,
 			center: new google.maps.LatLng(37.000000,-95.000000),
 			scaleControl: true,
+			mapTypeControl: false,
 			mapTypeId: google.maps.MapTypeId.ROADMAP
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
@@ -39,7 +41,7 @@
 		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
 
 		// add legend table
-		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('clusterNotif'));
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('volunteerList'));
 		
 	}
 
@@ -111,6 +113,7 @@
 				radius: flyingRadius * 1852, // 1852 meters in a nautical mile
 				icon: markerImage,
 				optimized: false,
+				title: username,
 				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
 					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
 					' target="_blank" >' + username + '</a> <br>' + 
@@ -159,6 +162,11 @@
 
 			} // end of for
 
+			// Fired when the map becomes idle after panning or zooming.
+		    google.maps.event.addListener(map, 'idle', function() {
+		        showVisibleMarkers();
+		    	} ) ;
+
 		//  testing cluster
 		var mcOptions = {
 			gridSize: 50, 
@@ -167,6 +175,36 @@
 
 		});  
 	}  // end updateVolunteers
+
+	// start new 2015-05-06 to show infoPanel
+	function showVisibleMarkers() { 
+    var bounds = map.getBounds(),
+        count = 0;
+                                   
+    for (var i = 0; i < flightPaths.length; i++) {
+        var marker = flightPaths[i],
+            infoPanel = marker.getTitle() ; 
+           // infoPanel = 'foo' ;
+
+        if(bounds.contains(marker.getPosition())===true) {
+            // alert("in bounds")
+            // infoPanel.show;
+
+            var myRow = "<tr><td>" + infoPanel + "</td><td>" + "</td></tr>";
+        	$("#MyTable tr:last").after(myRow);
+
+            count++;
+        }
+        else {
+        	//alert("out of bounds")
+            //infoPanel.hide;
+        }
+    }
+    
+    $('#infos h2 span').html(count);
+	} // end showVisivleMarkers
+
+
 
 	function downloadUrl(url, callback) {
 		var request = window.ActiveXObject ?
@@ -247,7 +285,7 @@ function setAllMap(map) {
 			border-width:2px;	
 		}
 		
-	#clusterNotif {
+	#volunteerList {
 			background: white;
 			padding: 10px;
 			border-style: solid;
@@ -258,11 +296,28 @@ function setAllMap(map) {
 	
 	</style>
 
-	<div id="clusterNotif">
+	<div id="volunteerList">
 	<table>
-		<tr valign="bottom" align="center">
+		<tr valign="top" align="center">
 			<td >
-				<A href="maps_volunteers_noncluster.php">Take me back to the old (non-clustered) map.</A>
+				    <table id="MyTable" border="0" cellpadding="0" cellspacing="0">
+				        <tr>
+				            <td>
+				                A
+				            </td>
+				            <td>
+				                1
+				            </td>
+				        </tr>
+				        <tr>
+				            <td>
+				                B
+				            </td>
+				            <td>
+				                2
+				            </td>
+				        </tr>
+				    </table>
 			</td>
 		</tr>
 	</table>
