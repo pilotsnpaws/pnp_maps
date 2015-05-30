@@ -11,6 +11,7 @@ select a.apt_id,
 		HAVING distance < 
 		50 */
 
+
 alter view vw_boxed_airports
 as
 select l.topic_id, a.apt_id, a.lat, a.lon, l.diffLat, l.diffLon
