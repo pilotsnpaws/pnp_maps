@@ -261,8 +261,9 @@ function setAllMap(map) {
 	<div id="clusterNotif">
 	<table>
 		<tr valign="bottom" align="center">
-			<td >
-				<A href="maps_volunteers_noncluster.php">Take me back to the old (non-clustered) map.</A>
+			<td align="left">
+				<A href="/maps_more/mapsmore_volunteersAirport.php">Search pilots by airport code</A><br>
+				<A href="/maps_more/mapsmore_volunteersZip.php">Search pilots by zip code</A>
 			</td>
 		</tr>
 	</table>
