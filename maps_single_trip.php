@@ -48,7 +48,7 @@
 		//map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('beta'));
 
 
-	}
+		} // end initialize
 
 	function get_checked_radio(radios) {
 	    for (var i = 0; i < radios.length; i++) {
@@ -57,228 +57,337 @@
 		    return current;
 		}
 	    }
-	}
+	} // end get_checked_radio
+
 
 	function updateTrips() {
 
-	removeFlightPaths();
+		removeFlightPaths();
 
-	//topic = document.getElementById("topic").value;
-	// alert(topic);
-	
-	var topic_param = gup('topic');
-	var searchURL = "maps_create_single_trip_xml.php?topic=" + topic_param;
-	downloadUrl(searchURL, function(data) {
-	var xml = data.responseXML;
-	
-	var pathInfoWindow = new google.maps.InfoWindow();
+		//topic = document.getElementById("topic").value;
+		// alert(topic);
 		
-	var trips = xml.documentElement.getElementsByTagName("trip");
-		for (var i = 0; i < trips.length; i++) {
-			var topic = trips[i].getAttribute("topicTitle");
-			var topicID = trips[i].getAttribute("topicID");
-			var lastPost = trips[i].getAttribute("lastPost");
-			var lastPostHuman = trips[i].getAttribute("lastPostHuman");
-			var sendLat = trips[i].getAttribute("sendLat");
-			var sendLon = trips[i].getAttribute("sendLon");
-			var recLat = trips[i].getAttribute("recLat");
-			var recLon = trips[i].getAttribute("recLon");
-			sendZip = trips[i].getAttribute("sendZip");
-			recZip = trips[i].getAttribute("recZip");
-			var sendCity = trips[i].getAttribute("sendCity");
-			var recCity = trips[i].getAttribute("recCity");
-			var flightPlanCoordinates = [
-				new google.maps.LatLng(sendLat, sendLon),
-				new google.maps.LatLng(recLat, recLon),
-				];
-			if (sendLat < recLat) 
-					// south to north trip
-					{ var directionColor = '#8D00DE' ; // purple
-					}
-				else  // north to south trip
-					{ var directionColor = '#00AD6E'; // greenish
-					}
+		var topic_param = gup('topic');
+		var searchURL = "maps_create_single_trip_xml.php?topic=" + topic_param;
+		downloadUrl(searchURL, function(data) {
+		var xml = data.responseXML;
+		
+		var pathInfoWindow = new google.maps.InfoWindow();
 			
-			var flightPath = new google.maps.Polyline({
-				path: flightPlanCoordinates,
-				strokeColor: directionColor,
-				strokeOpacity: 1.0,
-				strokeWeight: 3,
-				});
+		var trips = xml.documentElement.getElementsByTagName("trip");
+			for (var i = 0; i < trips.length; i++) {
+				var topic = trips[i].getAttribute("topicTitle");
+				var topicID = trips[i].getAttribute("topicID");
+				var lastPost = trips[i].getAttribute("lastPost");
+				var lastPostHuman = trips[i].getAttribute("lastPostHuman");
+				var sendLat = trips[i].getAttribute("sendLat");
+				var sendLon = trips[i].getAttribute("sendLon");
+				var recLat = trips[i].getAttribute("recLat");
+				var recLon = trips[i].getAttribute("recLon");
+				sendZip = trips[i].getAttribute("sendZip");
+				recZip = trips[i].getAttribute("recZip");
+				var sendCity = trips[i].getAttribute("sendCity");
+				var recCity = trips[i].getAttribute("recCity");
+				var flightPlanCoordinates = [
+					new google.maps.LatLng(sendLat, sendLon),
+					new google.maps.LatLng(recLat, recLon),
+					];
+				if (sendLat < recLat) 
+						// south to north trip
+						{ var directionColor = '#8D00DE' ; // purple
+						}
+					else  // north to south trip
+						{ var directionColor = '#00AD6E'; // greenish
+						}
+				
+				var flightPath = new google.maps.Polyline({
+					path: flightPlanCoordinates,
+					strokeColor: directionColor,
+					strokeOpacity: 1.0,
+					strokeWeight: 3,
+					});
 
-			flightPaths.push(flightPath);
+				flightPaths.push(flightPath);
 
-			// from http://stackoverflow.com/questions/16642451/center-and-auto-zoom-google-map
-			//  Make an array of the LatLng's of the markers you want to show
-			var LatLngList = new Array (new google.maps.LatLng(sendLat, sendLon), new google.maps.LatLng(recLat, recLon));
-			//  Create a new viewpoint bound
-			var bounds = new google.maps.LatLngBounds ();
-			//  Go through each...
-			for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
-			  //  And increase the bounds to take this point
-			  bounds.extend (LatLngList[i]);
+				// from http://stackoverflow.com/questions/16642451/center-and-auto-zoom-google-map
+				//  Make an array of the LatLng's of the markers you want to show
+				var LatLngList = new Array (new google.maps.LatLng(sendLat, sendLon), new google.maps.LatLng(recLat, recLon));
+				//  Create a new viewpoint bound
+				var bounds = new google.maps.LatLngBounds ();
+				//  Go through each...
+				for (var i = 0, LtLgLen = LatLngList.length; i < LtLgLen; i++) {
+				  //  And increase the bounds to take this point
+				  bounds.extend (LatLngList[i]);
+					}
+				//  Fit these bounds to the map
+				map.fitBounds (bounds);
+
+				// do length calcs, make a dummy path to get length.. if not, cant calc length in the html string below
+				var lengthFlightPath = new google.maps.Polyline({
+					path: flightPlanCoordinates
+					});
+				var lengthMeters = google.maps.geometry.spherical.computeLength(lengthFlightPath.getPath())  ;
+				var lengthMiles = Math.round(lengthMeters / 1609.344);
+				var lengthNM = Math.round(lengthMeters / 1852);
+
+				var strHTML = '<a href=/forum/viewtopic.php?f=5&amp;t=' + topicID +
+						' target="_blank" >' + topic + '</a><br>' + 
+						'From ' + sendCity + ' to ' + recCity + '<br>' + 
+						'Distance: ' + lengthMiles + ' miles / ' + lengthNM  + ' nm' + '<br>' + 
+						'Topic last updated: ' + lastPostHuman
+
+				// update the html window with trip details
+				document.getElementById("tripHTML").innerHTML = strHTML;
+				// document.getElementById("zipCode").value = sendZip;
+
+					google.maps.event.addListener(flightPath, 'click', function(event) {
+										
+					// get the click's latlng and use that as anchor for infoWindow
+					// found here: http://stackoverflow.com/questions/9998003/calling-infowindow-w-google-map-v3-api
+						var marker = new google.maps.Marker({
+							position: event.latLng,
+							map: map
+							}); 
+
+					// set the info popup content as the html from polyline above
+						pathInfoWindow.setContent(this.html);
+						pathInfoWindow.open(map, marker);
+
+						google.maps.event.addListener(map, 'click', function(event) {
+							pathInfoWindow.close(map, marker);
+						} );
+
+					});
+
+				flightPath.setMap(map);	
+				updateVolunteers();
 				}
-			//  Fit these bounds to the map
-			map.fitBounds (bounds);
-
-			// do length calcs, make a dummy path to get length.. if not, cant calc length in the html string below
-			var lengthFlightPath = new google.maps.Polyline({
-				path: flightPlanCoordinates
-				});
-			var lengthMeters = google.maps.geometry.spherical.computeLength(lengthFlightPath.getPath())  ;
-			var lengthMiles = Math.round(lengthMeters / 1609.344);
-			var lengthNM = Math.round(lengthMeters / 1852);
-
-			var strHTML = '<a href=/forum/viewtopic.php?f=5&amp;t=' + topicID +
-					' target="_blank" >' + topic + '</a><br>' + 
-					'From ' + sendCity + ' to ' + recCity + '<br>' + 
-					'Distance: ' + lengthMiles + ' miles / ' + lengthNM  + ' nm' + '<br>' + 
-					'Topic last updated: ' + lastPostHuman
-
-			// update the html window with trip details
-			document.getElementById("tripHTML").innerHTML = strHTML;
-			// document.getElementById("zipCode").value = sendZip;
-
-				google.maps.event.addListener(flightPath, 'click', function(event) {
-									
-				// get the click's latlng and use that as anchor for infoWindow
-				// found here: http://stackoverflow.com/questions/9998003/calling-infowindow-w-google-map-v3-api
-					var marker = new google.maps.Marker({
-						position: event.latLng,
-						map: map
-						}); 
-
-				// set the info popup content as the html from polyline above
-					pathInfoWindow.setContent(this.html);
-					pathInfoWindow.open(map, marker);
-
-					google.maps.event.addListener(map, 'click', function(event) {
-						pathInfoWindow.close(map, marker);
-					} );
-
-				});
-
-			flightPath.setMap(map);	
-			updateVolunteers();
-			}
-		});
-	}
+			});
+	} // end updateTrips
 		
 
 	function updateVolunteers() {
 	
-	removeVolunteers();
+		removeVolunteers();
 	
-	// get volunteer data
-	lastVisitAge = document.getElementById("lastVisitAge").value;
-	typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
-	//zipCode = sendZip; // document.getElementById("zipCode").value;
-	distance = document.getElementById("distance").value;
-	
-	var volSearchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + sendZip + ',' + recZip + "&distance=" + distance ;
-	
-	downloadUrl(volSearchURL, function(data) {
-	var xml = data.responseXML
-
-	var infoWindow = new google.maps.InfoWindow();
+		// get volunteer data
+		lastVisitAge = document.getElementById("lastVisitAge").value;
+		typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
+		//zipCode = sendZip; // document.getElementById("zipCode").value;
+		distance = document.getElementById("distance").value;
 		
-	var volunteers = xml.documentElement.getElementsByTagName("volunteer");
-	
-		for (var i = 0; i < volunteers.length; i++) {
-			var username = volunteers[i].getAttribute("username");
-			var userID = volunteers[i].getAttribute("userID");
-			var lastVisit = volunteers[i].getAttribute("lastVisit");
-			var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
-			var foster = volunteers[i].getAttribute("foster");
-			var pilot = volunteers[i].getAttribute("pilot");
-			var flyingRadius= volunteers[i].getAttribute("flyingRadius");
-			var airportID = volunteers[i].getAttribute("airportID");
-			var airportName = volunteers[i].getAttribute("airportName");
-			var zip = volunteers[i].getAttribute("zip");
-			var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
-			var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
-			var city = volunteers[i].getAttribute("city");
-			var state = volunteers[i].getAttribute("state");
-			var volunteerCoordinates = new google.maps.LatLng(lat,lon);
+		var volSearchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + sendZip + ',' + recZip + "&distance=" + distance ;
+		
+		downloadUrl(volSearchURL, function(data) {
+			var xml = data.responseXML
 
-			// is volunteer a foster or pilot, both, or neither?
-			// both foster and pilot
-			if ( (foster == '1') && (pilot == '1') ) 
-				{ var markerImage = 'images/icon_plane_house_small.svg' ;
-					var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
-				}
-			// just foster
-			else if (foster == '1') 
-				{ var markerImage = 'images/icon_house_small.svg' ; 
-				var pilotInfo = '';
-				}
-			// just pilot
-			else if (pilot == '1')
-				{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
-				var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
-				}
-			else  // then must be non-foster non-pilot volunteer
-				{ var markerImage = 'images/icon_volunteer.svg' ; 
-				var pilotInfo = '';
-				}
+			var infoWindow = new google.maps.InfoWindow();
 			
-			var volunteerMarker = new google.maps.Marker({
-				position: volunteerCoordinates,
-				radius: flyingRadius * 1852, // 1852 meters in a nautical mile
-				icon: markerImage,
-				optimized: false,
-				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
-					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-					' target="_blank" >' + username + '</a> <br>' + 
-					' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
-					pilotInfo + 
-					'Last visit: ' + lastVisitHuman +
-					'</div> ' 
-				});
+			var volunteers = xml.documentElement.getElementsByTagName("volunteer");
+		
+			for (var i = 0; i < volunteers.length; i++) {
+				var username = volunteers[i].getAttribute("username");
+				var userID = volunteers[i].getAttribute("userID");
+				var lastVisit = volunteers[i].getAttribute("lastVisit");
+				var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
+				var foster = volunteers[i].getAttribute("foster");
+				var pilot = volunteers[i].getAttribute("pilot");
+				var flyingRadius= volunteers[i].getAttribute("flyingRadius");
+				var airportID = volunteers[i].getAttribute("airportID");
+				var airportName = volunteers[i].getAttribute("airportName");
+				var zip = volunteers[i].getAttribute("zip");
+				var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
+				var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
+				var city = volunteers[i].getAttribute("city");
+				var state = volunteers[i].getAttribute("state");
+				var volunteerCoordinates = new google.maps.LatLng(lat,lon);
 
-			volunteerMarkers.push(volunteerMarker);
+				// is volunteer a foster or pilot, both, or neither?
+				// both foster and pilot
+				if ( (foster == '1') && (pilot == '1') ) 
+					{ var markerImage = 'images/icon_plane_house_small.svg' ;
+						var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
+					}
+				// just foster
+				else if (foster == '1') 
+					{ var markerImage = 'images/icon_house_small.svg' ; 
+					var pilotInfo = '';
+					}
+				// just pilot
+				else if (pilot == '1')
+					{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
+					var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
+					}
+				else  // then must be non-foster non-pilot volunteer
+					{ var markerImage = 'images/icon_volunteer.svg' ; 
+					var pilotInfo = '';
+					}
+				
+				var volunteerMarker = new google.maps.Marker({
+					position: volunteerCoordinates,
+					radius: flyingRadius * 1852, // 1852 meters in a nautical mile
+					icon: markerImage,
+					optimized: false,
+					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
+						'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+						' target="_blank" >' + username + '</a> <br>' + 
+						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
+						pilotInfo + 
+						'Last visit: ' + lastVisitHuman +
+						'</div> ' 
+					});  // end volunteerMarker
+
+				volunteerMarkers.push(volunteerMarker);
+				
+				google.maps.event.addListener(volunteerMarker, 'click', function(event) {
+					// get the click's latlng and use that as anchor for infoWindow
+						var marker = new google.maps.Marker({
+							position: event.latLng,
+							map: map	
+							}); 
+						
+					// set the info popup content as the html from polyline above, then open it
+						infoWindow.setContent(this.html);
+						infoWindow.open(map, marker);
+						
+					// setup the flying radius
+					var circleOptions = {
+						strokeColor: 'blue',
+						strokeOpacity: 0.5, 
+						fillColor: 'green',
+						fillOpacity: 0.2,
+						map: map,
+						center: event.latLng,
+						radius: this.radius
+					} ;			
+						
+					var flyingCircle = new google.maps.Circle(circleOptions);				
+
+					google.maps.event.addListener(map, 'click', function(event) {
+						flyingCircle.setMap(null) ; 
+						infoWindow.close(map, marker);
+						} );
+					google.maps.event.addListener(flyingCircle, 'click', function(event) {
+						flyingCircle.setMap(null) ; 
+						infoWindow.close(map, marker);
+						} );
+
+					} ) ;
+				volunteerMarker.setMap(map);	
+
+				} // end of for
+				
+			});  	 // end downloadUrl
+
+		// here is where adding to the downloadUrl needs to go
+
+		var latLonSearchURL = "maps_create_volunteer_locations_latlon_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + sendZip + ',' + recZip + "&distance=" + distance ;
+
+		downloadUrl(latLonSearchURL, function(data) {
+			var xml = data.responseXML
+
+			var infoWindow = new google.maps.InfoWindow();
 			
-			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
-				// get the click's latlng and use that as anchor for infoWindow
-					var marker = new google.maps.Marker({
-						position: event.latLng,
-						map: map	
-						}); 
-					
-				// set the info popup content as the html from polyline above, then open it
-					infoWindow.setContent(this.html);
-					infoWindow.open(map, marker);
-					
-				// setup the flying radius
-				var circleOptions = {
-					strokeColor: 'blue',
-					strokeOpacity: 0.5, 
-					fillColor: 'green',
-					fillOpacity: 0.2,
-					map: map,
-					center: event.latLng,
-					radius: this.radius
-				} ;			
-					
-				var flyingCircle = new google.maps.Circle(circleOptions);				
+			var volunteers = xml.documentElement.getElementsByTagName("volunteer");
+		
+			for (var i = 0; i < volunteers.length; i++) {
+				var username = volunteers[i].getAttribute("username");
+				var userID = volunteers[i].getAttribute("userID");
+				var lastVisit = volunteers[i].getAttribute("lastVisit");
+				var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
+				var foster = volunteers[i].getAttribute("foster");
+				var pilot = volunteers[i].getAttribute("pilot");
+				var flyingRadius= volunteers[i].getAttribute("flyingRadius");
+				var airportID = volunteers[i].getAttribute("airportID");
+				var airportName = volunteers[i].getAttribute("airportName");
+				var zip = volunteers[i].getAttribute("zip");
+				var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
+				var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
+				var city = volunteers[i].getAttribute("city");
+				var state = volunteers[i].getAttribute("state");
+				var volunteerCoordinates = new google.maps.LatLng(lat,lon);
 
-				google.maps.event.addListener(map, 'click', function(event) {
-					flyingCircle.setMap(null) ; 
-					infoWindow.close(map, marker);
-					} );
-				google.maps.event.addListener(flyingCircle, 'click', function(event) {
-					flyingCircle.setMap(null) ; 
-					infoWindow.close(map, marker);
-					} );
+				// is volunteer a foster or pilot, both, or neither?
+				// both foster and pilot
+				if ( (foster == '1') && (pilot == '1') ) 
+					{ var markerImage = 'images/icon_plane_house_small.svg' ;
+						var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
+					}
+				// just foster
+				else if (foster == '1') 
+					{ var markerImage = 'images/icon_house_small.svg' ; 
+					var pilotInfo = '';
+					}
+				// just pilot
+				else if (pilot == '1')
+					{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
+					var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
+					}
+				else  // then must be non-foster non-pilot volunteer
+					{ var markerImage = 'images/icon_volunteer.svg' ; 
+					var pilotInfo = '';
+					}
+				
+				var volunteerMarker = new google.maps.Marker({
+					position: volunteerCoordinates,
+					radius: flyingRadius * 1852, // 1852 meters in a nautical mile
+					icon: markerImage,
+					optimized: false,
+					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
+						'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+						' target="_blank" >' + username + '</a> <br>' + 
+						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
+						pilotInfo + 
+						'Last visit: ' + lastVisitHuman +
+						'</div> ' 
+					});  // end volunteerMarker
 
-				} ) ;
-			volunteerMarker.setMap(map);	
+				volunteerMarkers.push(volunteerMarker);
+				
+				google.maps.event.addListener(volunteerMarker, 'click', function(event) {
+					// get the click's latlng and use that as anchor for infoWindow
+						var marker = new google.maps.Marker({
+							position: event.latLng,
+							map: map	
+							}); 
+						
+					// set the info popup content as the html from polyline above, then open it
+						infoWindow.setContent(this.html);
+						infoWindow.open(map, marker);
+						
+					// setup the flying radius
+					var circleOptions = {
+						strokeColor: 'blue',
+						strokeOpacity: 0.5, 
+						fillColor: 'green',
+						fillOpacity: 0.2,
+						map: map,
+						center: event.latLng,
+						radius: this.radius
+					} ;			
+						
+					var flyingCircle = new google.maps.Circle(circleOptions);				
 
-			} // end of for
-			
-		});  	
-	// end updateVolunteers
-	}
+					google.maps.event.addListener(map, 'click', function(event) {
+						flyingCircle.setMap(null) ; 
+						infoWindow.close(map, marker);
+						} );
+					google.maps.event.addListener(flyingCircle, 'click', function(event) {
+						flyingCircle.setMap(null) ; 
+						infoWindow.close(map, marker);
+						} );
+
+					} ) ;
+				volunteerMarker.setMap(map);	
+
+				} // end of for
+				
+			});  	 // end downloadUrl for lat lon
+
+		//  end downloadLatLon
+
+
+	}  // end updateVolunteers
 
 	function downloadUrl(url, callback) {
 		var request = window.ActiveXObject ?
@@ -294,7 +403,7 @@
 
 		request.open('GET', url, true);
 		request.send(null);
-	}
+	}  // end downloadUrl
 
 // got this from http://stackoverflow.com/questions/9058911/cant-remove-mvcarray-polylines-using-google-maps-api-v3
 function removeFlightPaths() {
@@ -307,7 +416,7 @@ function removeFlightPaths() {
 
             // not sure you'll require this at this point, but if you want to also clear out your array of coordinates...
             //routePoints.clear();
-    }
+    } // end removeFlightPaths
     
     function removeVolunteers() {
            for (var i=0; i < volunteerMarkers.length; i++) {
@@ -316,7 +425,7 @@ function removeFlightPaths() {
 
             // you probably then want to empty out your array as well
             volunteerMarkers = [];
-    }
+    } // end removeVoluneers
 
 	function doNothing() {}
 	

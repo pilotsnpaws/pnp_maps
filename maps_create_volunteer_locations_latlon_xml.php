@@ -10,7 +10,7 @@
 
 // include forum config file for DB info
 // this needs to be prefixed with ../ for production
-include ( "forum/config.php");
+include ( "../forum/config.php");
 
 // get DB creds from forum config
 $username=$dbuser;
@@ -59,16 +59,17 @@ if ($zipCode == ''){
 	$zipCode = 'foo';
 	} 
 	else
-	{	$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, '
-		. ' ( 3959 * acos( cos( radians(b.lat) ) * cos( radians( a.lat ) ) * cos( radians( a.lon ) - radians(b.lon) ) '
-		. ' + sin( radians(b.lat) ) * sin( radians( a.lat ) ) ) ) AS distance '
-		. ' FROM airports a, '
-		. ' (select zip, lat, lon from zipcodes where zip in ( ' 
-		. $zipCode
-		. ' ) ) b '
-		. ' HAVING distance < '
-		. $distance
-		. ' ) z ) ' ;
+	{	$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, a.lat, a.lon, minB.minLat, maxB.maxLat, minB.minLon, maxB.maxLon '
+							. ' FROM airports a, '
+							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) as minLon from zipcodes where zip in ( '
+							. $zipCode
+							. ' ) ) minB, '
+                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) as maxLon from zipcodes where zip in ( '
+							. $zipCode
+							. ' ) ) maxB '
+							. ' WHERE CAST(a.lat AS DECIMAL (12 , 6 )) between minB.minLat and maxB.maxLat '
+                        	. ' and CAST(a.lon AS DECIMAL (12 , 6 )) between minB.minLon and maxB.maxLon '
+		 				. ' ) z  ) ' ;
 	} 
 
 

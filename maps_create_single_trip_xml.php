@@ -5,7 +5,7 @@
 // this supports maps_single_trip.php
 
 // include forum config file for DB info
-include ( "../forum/config.php");
+include ( "forum/config.php");
 
 // get DB creds from forum config
 $username=$dbuser;
