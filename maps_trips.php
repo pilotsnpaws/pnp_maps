@@ -1,5 +1,6 @@
 <!DOCTYPE html >
 <head>
+	<link rel="shortcut icon" href="http://www.pilotsnpaws.org/forum/favicon.ico" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org trip request map</title>
