@@ -119,7 +119,10 @@ if (mysqli_connect_errno())
     $colBreak = '</td><td>' ; 
 
     echo '<table class="TFtable" border="1">' ;
-    echo '<tr><th>User' . $headerBreak . 'Willing to fly' . $headerBreak . 'Miles from ' . $zipCode . '</th><th colspan=2>' .  'Home Airport' . $headerBreak . 'Airport City' . $headerBreak . 'Last active on forum' . '</th></tr>' ; 
+    echo '<tr><th>User' . $headerBreak . 'Willing to fly' . $headerBreak 
+        . 'Miles from ' . $zipCode . '</th><th colspan=2>' .  'Home Airport' . $headerBreak 
+        . 'Airport City' . $headerBreak 
+        . 'Last active on forum' . '</th></tr>' ; 
 
     while($row = mysqli_fetch_array($result)) {
         $rows[] = $row;
