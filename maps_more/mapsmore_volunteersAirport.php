@@ -103,7 +103,7 @@ if (mysqli_connect_errno())
     echo $lineBreak ; 
 
     $query = 'select user_id, username, pf_flying_radius, fn_distance(a.lat, a.lon, v.lat,v.lon) as distance, '
-    . ' a.apt_id as from_apt, a.apt_id, a.apt_name, a.city, last_visit_human ' 
+    . ' a.apt_id AS from_apt, a.apt_id, a.apt_name, a.city, last_visit_human, v.apt_id AS vol_apt_id, v.apt_name AS vol_apt_name, v.city AS vol_city ' 
     . ' from vw_volunteers v, '
     . ' airports a ' 
     . ' where pf_pilot_yn = 1 ' 
@@ -132,9 +132,9 @@ if (mysqli_connect_errno())
         $flying_radius = $row['pf_flying_radius'];
         $distance = $row['distance'];
         $airportCodeFrom = $row['from_apt'];
-        $airportCode = $row['apt_id'];
-        $airportName = $row['apt_name'];
-        $airportCity = $row['city'];
+        $airportCode = $row['vol_apt_id'];
+        $airportName = $row['vol_apt_name'];
+        $airportCity = $row['vol_city'];
         $lastVisitDate = $row['last_visit_human'];
         echo '<tr><td><a href="http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' . $user_id . '" target=_blank>' . $username . '</a>' . $colBreak . $flying_radius . $colBreak . $distance . $colBreak . '<a href="http://www.aopa.org/airports/' . $airportCode . '" target="_blank">' . $airportCode . '</a>' . $colBreak . $airportName . 
             $colBreak . $airportCity . $colBreak . $lastVisitDate . '</td></tr>' ;

@@ -6,7 +6,7 @@
 // added parseToXML to all possible strings returned that might contain ampersand or other errant characters
 
 // include forum config file for DB info
-include ( "../forum/config.php");
+include ( "forum/config.php");
 
 // get DB creds from forum config
 $username=$dbuser;
