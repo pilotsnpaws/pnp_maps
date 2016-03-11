@@ -88,6 +88,8 @@ if (mysqli_connect_errno())
                     <option value="50" >50 miles</option>
                     <option value="100">100 miles</option>
                     <option value="150">150 miles</option>
+                    <option value="200">200 miles</option>
+                    <option value="300">300 miles</option>
                 </select>
             <input type="submit" name="submit" value="Search" />
             </form>
