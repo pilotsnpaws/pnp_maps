@@ -4,8 +4,9 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org Volunteer Location Map</title>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k"></script>
     <script src="markerclusterer.js" type="text/javascript"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript">
     //<![CDATA[
 		
@@ -19,13 +20,29 @@
 
 	var min = .999965;
 	var max = 1.000035;
+
+	// support testing visible counter
+	var inboundsCounter = 0;
+	var inboundsUsers = [];
+
 	
 	function initialize() {
+		console.log('initialize-start')
 		var mapOptions = {
 			zoom: 5,
+		    zoomControl: true,
+		    zoomControlOptions: {
+		        position: google.maps.ControlPosition.RIGHT_BOTTOM
+		    },
+		    streetViewControl: false,
 			center: new google.maps.LatLng(37.000000,-95.000000),
 			scaleControl: true,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+		    mapTypeControl: true,
+    		mapTypeControlOptions: {
+        		style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        		position: google.maps.ControlPosition.TOP_CENTER
+    			}
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
 
@@ -37,12 +54,39 @@
 		map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('optionsBox'));
 
 		// add legend table
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
+		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('legend'));
 
-		// add legend table
-		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('clusterNotif'));
-		
-	}
+		// add data table of displayed volunteers table
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('mappedVolunteers'));
+
+		// 2016-03-10
+		// listener to fire after a zoom or move event - we need to figure out what markers are displayed on the current view
+		google.maps.event.addListener(map, 'idle', function() {
+			console.log('idle')
+			// reset the counter 0 that are inbounds
+			inboundsCounter = 0;
+			inboundsUsers = [];
+			$('.phpbbUsers').remove();
+	    	//console.log('flightPaths.length: ' + flightPaths.length);
+
+			for(var i = 0; i < flightPaths.length; i++) {
+			   if( map.getBounds().contains(flightPaths[i].getPosition()) ){
+			    	inboundsCounter = inboundsCounter + 1;
+					//console.log('inboundsCounter: ' + inboundsCounter);
+					inboundsUsers.push(flightPaths[i].inboundHtml);
+					//console.log(flightPaths[i].inboundHtml)
+					//console.log('inboundsUsers.length: ' + inboundsUsers.length);
+					// add to Mapped Volunteers div
+
+					$('<div class=phpbbUsers>' + '<img src=' + flightPaths[i].icon + '> ' + flightPaths[i].inboundHtml + '</div>').appendTo('#mappedVolunteers');
+
+			    }
+			}
+
+			});
+
+		console.log('initialize-end')
+	} // end initialize
 
 	function get_checked_radio(radios) {
 	    for (var i = 0; i < radios.length; i++) {
@@ -51,122 +95,135 @@
 		    return current;
 		}
 	    }
-	}
+	} // end get_checked_radio
 
 	function updateVolunteers() {
 	
-	lastVisitAge = document.getElementById("lastVisitAge").value;
-	typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
-	zipCode = document.getElementById("zipCode").value;
-	distance = document.getElementById("distance").value;
-	
-	var searchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + zipCode + "&distance=" + distance ;
-	//alert(searchURL);
-	downloadUrl(searchURL, function(data) {
-	var xml = data.responseXML;
-	
-	var infoWindow = new google.maps.InfoWindow();
+		lastVisitAge = document.getElementById("lastVisitAge").value;
+		typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
+		zipCode = document.getElementById("zipCode").value;
+		distance = document.getElementById("distance").value;
 		
-	var volunteers = xml.documentElement.getElementsByTagName("volunteer");
-	
-		for (var i = 0; i < volunteers.length; i++) {
-			var username = volunteers[i].getAttribute("username");
-			var userID = volunteers[i].getAttribute("userID");
-			var lastVisit = volunteers[i].getAttribute("lastVisit");
-			var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
-			var foster = volunteers[i].getAttribute("foster");
-			var pilot = volunteers[i].getAttribute("pilot");
-			var flyingRadius= volunteers[i].getAttribute("flyingRadius");
-			var airportID = volunteers[i].getAttribute("airportID");
-			var airportName = volunteers[i].getAttribute("airportName");
-			var zip = volunteers[i].getAttribute("zip");
-			var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
-			var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
-			var city = volunteers[i].getAttribute("city");
-			var state = volunteers[i].getAttribute("state");
-			var volunteerCoordinates = new google.maps.LatLng(lat,lon);
+		var searchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + zipCode + "&distance=" + distance ;
+		//alert(searchURL);
+		downloadUrl(searchURL, function(data) {
+		var xml = data.responseXML;
+		
+		var infoWindow = new google.maps.InfoWindow();
 
-			// is volunteer a foster or pilot, both, or neither?
-			// both foster and pilot
-			if ( (foster == '1') && (pilot == '1') ) 
-				{ var markerImage = 'images/icon_plane_house_small.svg' ;
-					var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
-				}
-			// just foster
-			else if (foster == '1') 
-				{ var markerImage = 'images/icon_house_small.svg' ; 
-				var pilotInfo = '';
-				}
-			// just pilot
-			else if (pilot == '1')
-				{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
-				var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
-				}
-			else  // then must be non-foster non-pilot volunteer
-				{ var markerImage = 'images/icon_volunteer.svg' ; 
-				var pilotInfo = '';
-				}
 			
-			var volunteerMarker = new google.maps.Marker({
-				position: volunteerCoordinates,
-				radius: flyingRadius * 1852, // 1852 meters in a nautical mile
-				icon: markerImage,
-				optimized: false,
-				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
-					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-					' target="_blank" >' + username + '</a> <br>' + 
-					' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
-					pilotInfo + 
-					'Last visit: ' + lastVisitHuman +
-					'</div> ' 
-				});
+		var volunteers = xml.documentElement.getElementsByTagName("volunteer");
+		
+		console.log('')
 
-			flightPaths.push(volunteerMarker);
-			
-			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
-				// get the click's latlng and use that as anchor for infoWindow
-					var marker = new google.maps.Marker({
-						position: event.latLng,
-						map: map
-						}); 
-					
-				// set the info popup content as the html from polyline above, then open it
-					infoWindow.setContent(this.html);
-					infoWindow.open(map, marker);
-					
-				// setup the flying radius
-				var circleOptions = {
-					strokeColor: 'blue',
-					strokeOpacity: 0.5, 
-					fillColor: 'green',
-					fillOpacity: 0.2,
-					map: map,
-					center: event.latLng,
-					radius: this.radius
-				} ;			
-					
-				var flyingCircle = new google.maps.Circle(circleOptions);				
+			for (var i = 0; i < volunteers.length; i++) {
+				var username = volunteers[i].getAttribute("username");
+				var userID = volunteers[i].getAttribute("userID");
+				var lastVisit = volunteers[i].getAttribute("lastVisit");
+				var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
+				var foster = volunteers[i].getAttribute("foster");
+				var pilot = volunteers[i].getAttribute("pilot");
+				var flyingRadius= volunteers[i].getAttribute("flyingRadius");
+				var airportID = volunteers[i].getAttribute("airportID");
+				var airportName = volunteers[i].getAttribute("airportName");
+				var zip = volunteers[i].getAttribute("zip");
+				var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
+				var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
+				var city = volunteers[i].getAttribute("city");
+				var state = volunteers[i].getAttribute("state");
+				var volunteerCoordinates = new google.maps.LatLng(lat,lon);
 
-				google.maps.event.addListener(map, 'click', function(event) {
-					flyingCircle.setMap(null) ; 
-					infoWindow.close(map, marker);
-					} );
-				google.maps.event.addListener(flyingCircle, 'click', function(event) {
-					flyingCircle.setMap(null) ; 
-					infoWindow.close(map, marker);
-					} );
+				// is volunteer a foster or pilot, both, or neither?
+				// both foster and pilot
+				if ( (foster == '1') && (pilot == '1') ) 
+					{ var markerImage = 'images/icon_plane_house_small.svg' ;
+						var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
+					}
+				// just foster
+				else if (foster == '1') 
+					{ var markerImage = 'images/icon_house_small.svg' ; 
+					var pilotInfo = '';
+					}
+				// just pilot
+				else if (pilot == '1')
+					{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
+					var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
+					}
+				else  // then must be non-foster non-pilot volunteer
+					{ var markerImage = 'images/icon_volunteer.svg' ; 
+					var pilotInfo = '';
+					}
 
-				} ) ;
+				var volunteerMarker = new google.maps.Marker({
+					position: volunteerCoordinates,
+					radius: flyingRadius * 1852, // 1852 meters in a nautical mile
+					icon: markerImage,
+					optimized: false,
+					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
+						'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+						' target="_blank" >' + username + '</a> <br>' + 
+						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
+						pilotInfo + 
+						'Last visit: ' + lastVisitHuman +
+						'</div> ' ,
+					inboundHtml: '<a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+						' target="_blank" >' + username + '</a> <br>'
+					});  // end volunteerMarker
 
-			} // end of for
 
-		//  testing cluster
-		var mcOptions = {
-			gridSize: 50, 
-			maxZoom: 9};
-		mc = new MarkerClusterer(map, flightPaths, mcOptions);
+				flightPaths.push(volunteerMarker);
+				console.log('volunteerMarker pushed')
+				if( map.getBounds().contains(volunteerMarker.getPosition()) ){
+					    	inboundsCounter = inboundsCounter + 1;
+					    	// console.log('inboundsCounter: ' + inboundsCounter);
+					    	// console.log('flightPaths.length: ' + flightPaths.length);
+					    }
 
-		});  
+				google.maps.event.addListener(volunteerMarker, 'click', function(event) {
+					// get the click's latlng and use that as anchor for infoWindow
+						var marker = new google.maps.Marker({
+							position: event.latLng,
+							map: map
+							});
+
+					// set the info popup content as the html from polyline above, then open it
+						infoWindow.setContent(this.html);
+						infoWindow.open(map, marker);
+
+					// setup the flying radius
+					var circleOptions = {
+						strokeColor: 'blue',
+						strokeOpacity: 0.5,
+						fillColor: 'green',
+						fillOpacity: 0.2,
+						map: map,
+						center: event.latLng,
+						radius: this.radius
+					} ;
+
+					var flyingCircle = new google.maps.Circle(circleOptions);
+
+					google.maps.event.addListener(map, 'click', function(event) {
+						flyingCircle.setMap(null) ; 
+						infoWindow.close(map, marker);
+						} );
+					google.maps.event.addListener(flyingCircle, 'click', function(event) {
+						flyingCircle.setMap(null) ; 
+						infoWindow.close(map, marker);
+						} );
+
+					} ) ;
+
+				} // end of for
+
+			//  testing cluster
+			var mcOptions = {
+				gridSize: 50, 
+				maxZoom: 9};
+			mc = new MarkerClusterer(map, flightPaths, mcOptions);
+
+			});  
+
 	}  // end updateVolunteers
 
 	function downloadUrl(url, callback) {
@@ -187,9 +244,10 @@
 
 	function doNothing() {}
 
+
 // Deletes all markers in the array by removing references to them.
 function deleteMarkers() {
-  //alert(mc);
+  console.log('deleteMarkers-start')
   setAllMap(null);
   flightPaths = [];
   mc.clearMarkers();
@@ -204,22 +262,19 @@ function setAllMap(map) {
 
 	google.maps.event.addDomListener(window, 'load', initialize);
 
+	console.log('inboundsCounter: ' + inboundsCounter);
+
     //]]>
 
+    // jquery test to dynamically add rows
+function jqueryTest() {
+	$('<div class=test>' + 'foo' + '</div>').appendTo('#mappedVolunteers');
+	console.log('jqueryTest fired')
+	}
+
+jqueryTest();
+
   </script>
-
-	<!-- Google analytics added 2015-05-06 --> 
-	<script>
-	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	  ga('create', 'UA-62646402-1', 'auto');
-	  ga('send', 'pageview');
-
-	</script>
-	<!-- End Google analytics added 2015-05-06 --> 
 
   </head>
 
@@ -230,14 +285,6 @@ function setAllMap(map) {
 		margin:0;
 		padding:0;
 		height:100%; /* needed for container min-height */
-		}	
-		
-	#legend {
-			background: white;
-			padding: 5px;
-			border-style: solid;
-			border-color: black;
-			border-width:2px;	
 		}
 
 	#optionsBox {
@@ -245,21 +292,32 @@ function setAllMap(map) {
 			padding: 10px;
 			border-style: solid;
 			border-color: black;
-			border-width:2px;	
+			border-width:2px;
 		}
-		
-	#clusterNotif {
+
+	#legend {
 			background: white;
 			padding: 10px;
 			border-style: solid;
 			border-color: black;
-			border-width:2px;	
+			border-width:2px;
 		}
-	
-	
+
+	#mappedVolunteers {
+			background: white;
+			padding: 10px;
+			border-style: solid;
+			border-color: black;
+			border-width:2px;
+		}
+
 	</style>
 
-	<div id="clusterNotif">
+	<div id="mappedVolunteers"  >
+			<div style="margin-bottom:5px;font-weight:500;">Mapped volunteers:</div>
+	</div>
+
+	<div id="legend">
 	<table>
 		<tr valign="bottom" align="center">
 			<td align="left">
@@ -268,10 +326,7 @@ function setAllMap(map) {
 			</td>
 		</tr>
 	</table>
-	</div>
-
-	<div id="legend">
-	<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
+		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
 	<table>
 		<tr valign="bottom" align="center">
 			<td >
@@ -323,8 +378,7 @@ function setAllMap(map) {
 				<option value="150">150 miles</option>
 				<option value="200">200 miles</option>
 			</select>
-		
-		
+
 		<input type="button" onclick="deleteMarkers();updateVolunteers()" value="Search"/>
 	</div>
 
@@ -332,3 +386,15 @@ function setAllMap(map) {
   </body>
 
 </html>
+	<!-- Google analytics added 2015-05-06 --> 
+	<script>
+	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  ga('create', 'UA-62646402-1', 'auto');
+	  ga('send', 'pageview');
+
+	</script>
+	<!-- End Google analytics added 2015-05-06 -->
