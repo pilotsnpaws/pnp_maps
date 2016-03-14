@@ -62,12 +62,22 @@
 		// 2016-03-10
 		// listener to fire after a zoom or move event - we need to figure out what markers are displayed on the current view
 		google.maps.event.addListener(map, 'idle', function() {
-			console.log('idle')
+			console.log('map-idle')
+			updateMappedVolunteers();
+
+			});
+
+		console.log('initialize-end')
+	} // end initialize
+
+
+	function updateMappedVolunteers() {
 			// reset the counter 0 that are inbounds
+			console.log('updateMappedVolunteers-start')
 			inboundsCounter = 0;
 			inboundsUsers = [];
 			$('.phpbbUsers').remove();
-	    	//console.log('flightPaths.length: ' + flightPaths.length);
+	    	console.log('flightPaths.length: ' + flightPaths.length);
 
 			for(var i = 0; i < flightPaths.length; i++) {
 			   if( map.getBounds().contains(flightPaths[i].getPosition()) ){
@@ -82,11 +92,8 @@
 
 			    }
 			}
-
-			});
-
-		console.log('initialize-end')
-	} // end initialize
+			console.log('updateMappedVolunteers-end')
+		} // end updateMappedVolunteers
 
 	function get_checked_radio(radios) {
 	    for (var i = 0; i < radios.length; i++) {
@@ -98,23 +105,21 @@
 	} // end get_checked_radio
 
 	function updateVolunteers() {
-	
+
+		console.log('updateVolunteers-start')
 		lastVisitAge = document.getElementById("lastVisitAge").value;
 		typeToShow = get_checked_radio(document.getElementsByName("typesToShow")).value;
 		zipCode = document.getElementById("zipCode").value;
 		distance = document.getElementById("distance").value;
-		
+
 		var searchURL = "maps_create_volunteer_locations_xml.php?lastVisitAge=" + lastVisitAge + "&typesToShow=" + typeToShow + "&zipCode=" + zipCode + "&distance=" + distance ;
 		//alert(searchURL);
 		downloadUrl(searchURL, function(data) {
 		var xml = data.responseXML;
-		
+
 		var infoWindow = new google.maps.InfoWindow();
 
-			
 		var volunteers = xml.documentElement.getElementsByTagName("volunteer");
-		
-		console.log('')
 
 			for (var i = 0; i < volunteers.length; i++) {
 				var username = volunteers[i].getAttribute("username");
@@ -172,11 +177,11 @@
 
 
 				flightPaths.push(volunteerMarker);
-				console.log('volunteerMarker pushed')
+				// console.log('volunteerMarker pushed')
 				if( map.getBounds().contains(volunteerMarker.getPosition()) ){
 					    	inboundsCounter = inboundsCounter + 1;
 					    	// console.log('inboundsCounter: ' + inboundsCounter);
-					    	// console.log('flightPaths.length: ' + flightPaths.length);
+					    	console.log('flightPaths.length: ' + flightPaths.length);
 					    }
 
 				google.maps.event.addListener(volunteerMarker, 'click', function(event) {
@@ -216,13 +221,18 @@
 
 				} // end of for
 
-			//  testing cluster
+			//  cluster the markers
 			var mcOptions = {
 				gridSize: 50, 
-				maxZoom: 9};
+				maxZoom: 9
+				};
 			mc = new MarkerClusterer(map, flightPaths, mcOptions);
 
-			});  
+			updateMappedVolunteers();
+
+			}); // end downloadUrl
+
+		console.log('updateVolunteers-end');
 
 	}  // end updateVolunteers
 
@@ -247,10 +257,11 @@
 
 // Deletes all markers in the array by removing references to them.
 function deleteMarkers() {
-  console.log('deleteMarkers-start')
+  console.log('deleteMarkers-start');
   setAllMap(null);
   flightPaths = [];
   mc.clearMarkers();
+  console.log('deleteMarkers-end');
 }
 
   // Sets the map on all markers in the array.
