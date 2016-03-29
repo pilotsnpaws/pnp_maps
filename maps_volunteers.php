@@ -7,6 +7,8 @@
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k"></script>
     <script src="markerclusterer.js" type="text/javascript"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script src="js/clipboard.min.js" type="text/javascript"></script>
+
     <script type="text/javascript">
     //<![CDATA[
 		
@@ -70,13 +72,13 @@
 		console.log('initialize-end')
 	} // end initialize
 
-
 	function updateMappedVolunteers() {
 			// reset the counter 0 that are inbounds
 			console.log('updateMappedVolunteers-start')
 			inboundsCounter = 0;
 			inboundsUsers = [];
 			$('.phpbbUsers').remove();
+			$('.usernamesForCopy').remove();
 	    	console.log('flightPaths.length: ' + flightPaths.length);
 
 			for(var i = 0; i < flightPaths.length; i++) {
@@ -84,11 +86,12 @@
 			    	inboundsCounter = inboundsCounter + 1;
 					//console.log('inboundsCounter: ' + inboundsCounter);
 					inboundsUsers.push(flightPaths[i].inboundHtml);
-					//console.log(flightPaths[i].inboundHtml)
-					//console.log('inboundsUsers.length: ' + inboundsUsers.length);
+					// console.log(flightPaths[i].airportLink)
+					// console.log('inboundsUsers.length: ' + inboundsUsers.length);
 					// add to Mapped Volunteers div
 
-					$('<div class=phpbbUsers>' + '<img src=' + flightPaths[i].icon + '> ' + flightPaths[i].inboundHtml + '</div>').appendTo('#mappedVolunteers');
+					$('<div class=phpbbUsers>' + flightPaths[i].airportLink + ' ' + flightPaths[i].inboundHtml + '</div>').appendTo('#mappedVolunteers');
+					$('<div class=usernamesForCopy >' + flightPaths[i].usernameForCopy + '</div>').appendTo('#hiddenUsernames');
 
 			    }
 			}
@@ -164,15 +167,17 @@
 					radius: flyingRadius * 1852, // 1852 meters in a nautical mile
 					icon: markerImage,
 					optimized: false,
-					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
+					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +
 						'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-						' target="_blank" >' + username + '</a> <br>' + 
+						' target="_blank" >' + username + '</a> <br>' +
 						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
-						pilotInfo + 
+						pilotInfo +
 						'Last visit: ' + lastVisitHuman +
 						'</div> ' ,
 					inboundHtml: '<a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-						' target="_blank" >' + username + '</a> <br>'
+						' target="_blank" >' + username + '</a>' ,
+					airportLink: '<a href="http://www.aopa.org/airports/' + airportID + '" target="_blank" >' + airportID + '</a>',
+					usernameForCopy: username + '<br>'
 					});  // end volunteerMarker
 
 
@@ -181,7 +186,7 @@
 				if( map.getBounds().contains(volunteerMarker.getPosition()) ){
 					    	inboundsCounter = inboundsCounter + 1;
 					    	// console.log('inboundsCounter: ' + inboundsCounter);
-					    	console.log('flightPaths.length: ' + flightPaths.length);
+					    	// console.log('flightPaths.length: ' + flightPaths.length);
 					    }
 
 				google.maps.event.addListener(volunteerMarker, 'click', function(event) {
@@ -275,15 +280,6 @@ function setAllMap(map) {
 
 	console.log('inboundsCounter: ' + inboundsCounter);
 
-    //]]>
-
-    // jquery test to dynamically add rows
-function jqueryTest() {
-	$('<div class=test>' + 'foo' + '</div>').appendTo('#mappedVolunteers');
-	console.log('jqueryTest fired')
-	}
-
-jqueryTest();
 
   </script>
 
@@ -322,10 +318,35 @@ jqueryTest();
 			border-width:2px;
 		}
 
+	#hiddenUsernames {
+			width: 0px;
+			height: 0px;
+	}
+
 	</style>
+
+	<div id="hiddenUsernames" >
+	</div>
 
 	<div id="mappedVolunteers"  >
 			<div style="margin-bottom:5px;font-weight:500;">Mapped volunteers:</div>
+
+
+			<script>
+				var clipboard = new Clipboard('.btn');
+
+				clipboard.on('success', function(e) {
+				    console.log(e);
+				});
+
+				clipboard.on('error', function(e) {
+				    console.log(e);
+				});
+			</script>
+
+			<div></div>
+			<button class="btn" data-clipboard-action="copy" data-clipboard-target="#hiddenUsernames">Copy usernames to clipboard</button>
+
 	</div>
 
 	<div id="legend">
@@ -390,7 +411,7 @@ jqueryTest();
 				<option value="200">200 miles</option>
 			</select>
 
-		<input type="button" onclick="deleteMarkers();updateVolunteers()" value="Search"/>
+    		<input type="button" onclick="deleteMarkers();updateVolunteers()" value="Search"/>
 	</div>
 
     <div id="gMap" style="width: 100%; height: 100%;"></div>
