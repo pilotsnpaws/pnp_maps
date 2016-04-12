@@ -15,6 +15,7 @@ select date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) 
 from phpbb_topics t 
     LEFT OUTER JOIN zipcodes z_send on t.pnp_sendZip = z_send.zip 
     LEFT OUTER JOIN zipcodes z_rec on t.pnp_recZip = z_rec.zip 
-where forum_id = 5 
+where t.forum_id = 5 
     and t.pnp_sendZip is not null
     and t.pnp_recZip is not null
+    and t.icon_id NOT IN (11,12) /* see icons in phpbb_icons, we exclude the Done & Cancel icons here */
