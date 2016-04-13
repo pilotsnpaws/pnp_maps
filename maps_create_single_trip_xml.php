@@ -12,7 +12,8 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 // include forum config file for DB info
-include ( "../forum/config.php");
+include "settings.php";
+include ($configPath);
 
 // get DB creds from forum config
 $username=$dbuser;
@@ -22,12 +23,12 @@ $server=$dbhost;
 
 function parseToXML($htmlStr) 
 { 
-$xmlStr=str_replace('<','&lt;',$htmlStr); 
-$xmlStr=str_replace('>','&gt;',$xmlStr); 
-$xmlStr=str_replace('"','&quot;',$xmlStr); 
-$xmlStr=str_replace("'",'&#39;',$xmlStr); 
-$xmlStr=str_replace("&",'&amp;',$xmlStr); 
-return $xmlStr; 
+  $xmlStr=str_replace('<','&lt;',$htmlStr); 
+  $xmlStr=str_replace('>','&gt;',$xmlStr); 
+  $xmlStr=str_replace('"','&quot;',$xmlStr); 
+  $xmlStr=str_replace("'",'&#39;',$xmlStr); 
+  $xmlStr=str_replace("&",'&amp;',$xmlStr); 
+  return $xmlStr; 
 } 
 
 

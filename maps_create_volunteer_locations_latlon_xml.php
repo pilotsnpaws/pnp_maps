@@ -1,16 +1,15 @@
 <?php
 
-//no  cache headers 
+//no cache headers 
 header("Expires: Mon, 26 Jul 1990 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
-
 // include forum config file for DB info
-// this needs to be prefixed with ../ for production
-include ( "../forum/config.php");
+include "settings.php";
+include ($configPath);
 
 // get DB creds from forum config
 $username=$dbuser;

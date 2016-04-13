@@ -1,11 +1,12 @@
 <?php
 
+// update 2016-04-13 to move to settings.php for config location
 // last updated for production use 2013-08-22  9:17am by Mike Green
 // changes:
 // 2013-08-22 revised underlying vw_lines time conversion to use correct timestamp, resolved bug with not showing posts in the last few hours
 // added parseToXML to all possible strings returned that might contain ampersand or other errant characters
 
-//no  cache headers 
+//no cache headers 
 header("Expires: Mon, 26 Jul 1990 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate");
@@ -13,7 +14,8 @@ header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
 
 // include forum config file for DB info
-include ( "../forum/config.php");
+include "settings.php";
+include ($configPath);
 
 // get DB creds from forum config
 $username=$dbuser;
@@ -23,12 +25,12 @@ $server=$dbhost;
 
 function parseToXML($htmlStr) 
 { 
-$xmlStr=str_replace('<','&lt;',$htmlStr); 
-$xmlStr=str_replace('>','&gt;',$xmlStr); 
-$xmlStr=str_replace('"','&quot;',$xmlStr); 
-$xmlStr=str_replace("'",'&#39;',$xmlStr); 
-$xmlStr=str_replace("&",'&amp;',$xmlStr); 
-return $xmlStr; 
+  $xmlStr=str_replace('<','&lt;',$htmlStr); 
+  $xmlStr=str_replace('>','&gt;',$xmlStr); 
+  $xmlStr=str_replace('"','&quot;',$xmlStr); 
+  $xmlStr=str_replace("'",'&#39;',$xmlStr); 
+  $xmlStr=str_replace("&",'&amp;',$xmlStr); 
+  return $xmlStr; 
 } 
 
 
