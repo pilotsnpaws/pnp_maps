@@ -5,8 +5,15 @@
 // 2013-08-22 revised underlying vw_lines time conversion to use correct timestamp, resolved bug with not showing posts in the last few hours
 // added parseToXML to all possible strings returned that might contain ampersand or other errant characters
 
+//no  cache headers 
+header("Expires: Mon, 26 Jul 1990 05:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+
 // include forum config file for DB info
-include ( "forum/config.php");
+include ( "../forum/config.php");
 
 // get DB creds from forum config
 $username=$dbuser;
