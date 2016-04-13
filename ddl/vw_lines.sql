@@ -3,7 +3,7 @@ it provides the topic and sending/receiving lat/lon for forum 5, the request for
 */
 alter view vw_lines
 AS
-select date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) as last_post,
+select DISTINCT date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) as last_post,
     DATE_FORMAT(date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND )
         , '%a, %D %b %Y @ %h:%i%p') AS last_post_human,
     t.topic_id, t.topic_title,
@@ -11,7 +11,8 @@ select date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) 
     concat(z_send.city,', ',z_send.state) as sendCity,
     concat(z_rec.city,', ',z_rec.state) as recCity,
     (z_send.lat - z_rec.lat) AS diffLat,
-    (z_send.lon - z_rec.lon) AS diffLon
+    (z_send.lon - z_rec.lon) AS diffLon,
+    t.icon_id
 from phpbb_topics t 
     LEFT OUTER JOIN zipcodes z_send on t.pnp_sendZip = z_send.zip 
     LEFT OUTER JOIN zipcodes z_rec on t.pnp_recZip = z_rec.zip 
@@ -19,3 +20,8 @@ where t.forum_id = 5
     and t.pnp_sendZip is not null
     and t.pnp_recZip is not null
     and t.icon_id NOT IN (11,12) /* see icons in phpbb_icons, we exclude the Done & Cancel icons here */
+    AND t.topic_id NOT IN (SELECT DISTINCT topic_id
+        FROM phpbb_posts
+        WHERE icon_id
+        IN ( 11, 12 ) 
+        AND forum_id =5)
