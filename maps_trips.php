@@ -4,7 +4,7 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org trip request map</title>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&sensor=false&v=3&libraries=geometry"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&v=3&libraries=geometry"></script>
     <script type="text/javascript">
     //<![CDATA[
 		
@@ -13,7 +13,7 @@
 	var lastPostAge;
 	function initialize() {
 		var mapOptions = {
-			zoom: 4,
+			zoom: 5,
 			center: new google.maps.LatLng(37.000000,-95.000000),
 			scaleControl: true,
 			mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -77,7 +77,7 @@
 			var lengthMiles = Math.round(lengthMeters / 1609.344);
 			var lengthNM = Math.round(lengthMeters / 1852);
 
-			var strHTML = '<a href=/forum/viewtopic.php?f=5&amp;t=' + topicID +
+			var strHTML = '<a href=/forum/viewtopic.php?t=' + topicID +
 					' target="_blank" >' + topic + '</a><br>' + 
 					'From ' + sendCity + ' to ' + recCity + '<br>' + 
 					'Distance: ' + lengthMiles + ' miles / ' + lengthNM  + ' nm' + '<br>' + 
@@ -169,7 +169,7 @@ function removeFlightPaths() {
 
   </head>
 
-  <body onload="load()">
+  <body >
 
 	<style>
 	html, body {

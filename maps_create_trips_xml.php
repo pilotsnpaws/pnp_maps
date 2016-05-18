@@ -53,9 +53,10 @@ if (mysqli_connect_errno($mysqli))
   } else { } ;
 
 $query = 'select last_post, last_post_human, topic_id, topic_title, pnp_sendZip, ' 
-		. 'sendLat, sendLon, pnp_recZip, recLat, recLon, sendCity, recCity '  
+		. 'sendLat, sendLon, pnp_recZip, recLat, recLon, sendCity, recCity, forum_id, trip_status  '  
 		. 'from vw_lines '
-		. 'where last_post > date_add(cast(current_date as datetime), INTERVAL -'
+		. 'where trip_status = \'Open\' '
+    . 'AND last_post > date_add(cast(current_date as datetime), INTERVAL -'
 		. $lastPostAge
 		. ' DAY)';
 
@@ -85,6 +86,8 @@ while($row = $result->fetch_assoc()){
   echo 'recLon="' . parseToXML($row['recLon']) . '" ';
   echo 'sendCity="' . parseToXML($row['sendCity']) . '" ';
   echo 'recCity="' . parseToXML($row['recCity']) . '" ';  
+  echo 'forum_id="' . parseToXML($row['forum_id']) . '" ';  
+  echo 'trip_status="' . parseToXML($row['trip_status']) . '" ';  
   echo '/>';
 }
 

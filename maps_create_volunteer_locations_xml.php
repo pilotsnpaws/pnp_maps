@@ -59,8 +59,7 @@ if ($zipCode == ''){
 	} 
 	else
 	{	$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, '
-		. ' ( 3959 * acos( cos( radians(b.lat) ) * cos( radians( a.lat ) ) * cos( radians( a.lon ) - radians(b.lon) ) '
-		. ' + sin( radians(b.lat) ) * sin( radians( a.lat ) ) ) ) AS distance '
+		. ' fn_distance(a.lat, a.lon, b.lat, b.lon) as distance '
 		. ' FROM airports a, '
 		. ' (select zip, lat, lon from zipcodes where zip in ( ' 
 		. $zipCode
@@ -110,7 +109,11 @@ $query = 'select last_visit, last_visit_human, user_id, username, pf_foster_yn, 
 		. $distanceFilterSQL ;
 
 //echo $query;
-$result = $mysqli->query($query);
+$result = $mysqli->query($query) or die ($mysqli->error);
+
+
+//echo("Errorcode: " . mysqli_errno($con));
+
 
 // Start XML file, echo parent node
 header("Content-type: text/xml");

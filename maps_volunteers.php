@@ -5,9 +5,11 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org Volunteer Location Map</title>
     <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k"></script>
-    <script src="markerclusterer.js" type="text/javascript"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js" type="text/javascript"></script>
+    <script src="js/markerclusterer.js" type="text/javascript"></script>
+    <script src="js/jquery.min.js" type="text/javascript"></script>
     <script src="js/clipboard.min.js" type="text/javascript"></script>
+
+
 
     <script type="text/javascript">
     //<![CDATA[
@@ -64,12 +66,12 @@
 		// 2016-03-10
 		// listener to fire after a zoom or move event - we need to figure out what markers are displayed on the current view
 		google.maps.event.addListener(map, 'idle', function() {
-			console.log('map-idle')
+			// console.log('map-idle')
 			updateMappedVolunteers();
 
 			});
 
-		console.log('initialize-end')
+		// console.log('initialize-end')
 	} // end initialize
 
 	function updateMappedVolunteers() {
@@ -229,7 +231,8 @@
 			//  cluster the markers
 			var mcOptions = {
 				gridSize: 50, 
-				maxZoom: 9
+				maxZoom: 9,
+    			imagePath: 'https://cdn.rawgit.com/googlemaps/js-marker-clusterer/gh-pages/images/m' 
 				};
 			mc = new MarkerClusterer(map, flightPaths, mcOptions);
 
@@ -321,16 +324,15 @@ function setAllMap(map) {
 	#hiddenUsernames {
 			width: 0px;
 			height: 0px;
-	}
+		}
 
 	</style>
 
-	<div id="hiddenUsernames" >
+	<div id="hiddenUsernames">
 	</div>
 
-	<div id="mappedVolunteers"  >
+	<div id="mappedVolunteers">
 			<div style="margin-bottom:5px;font-weight:500;">Mapped volunteers:</div>
-
 
 			<script>
 				var clipboard = new Clipboard('.btn');
@@ -346,8 +348,7 @@ function setAllMap(map) {
 
 			<div></div>
 			<button class="btn" data-clipboard-action="copy" data-clipboard-target="#hiddenUsernames">Copy usernames to clipboard</button>
-
-	</div>
+	</div> 
 
 	<div id="legend">
 	<table>

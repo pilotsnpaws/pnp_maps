@@ -1,11 +1,14 @@
 <!DOCTYPE html >
-<head> 
+  <head> 
 	<link rel="shortcut icon" href="http://www.pilotsnpaws.org/forum/favicon.ico" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org single trip map</title>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&v=3&libraries=geometry"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&libraries=geometry"></script>
+    <script src="js/jquery.min.js" type="text/javascript"></script>
+    <script src="js/clipboard.min.js" type="text/javascript"></script>
     <script type="text/javascript">
+
     //<![CDATA[
 		
 	var map;
@@ -27,28 +30,73 @@
 
 	function initialize() {
 		var mapOptions = {
-			zoom: 4,
-			center: new google.maps.LatLng(37.000000,-95.000000), // need to zoom to just trip 
+		    zoomControl: true,
+		    zoomControlOptions: {
+		        position: google.maps.ControlPosition.RIGHT_BOTTOM
+		    },
+		    streetViewControl: false,
+			center: new google.maps.LatLng(37.000000,-95.000000),
 			scaleControl: true,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+		    mapTypeControl: true,
+    		mapTypeControlOptions: {
+        		style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        		position: google.maps.ControlPosition.TOP_CENTER
+    			}
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
 		updateTrips();
-		
-		// add options box
-		map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('optionsBox'));
 
+		// add data table of displayed volunteers table
+		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('mappedVolunteers'));
+		
 		// add trip details table
 		map.controls[google.maps.ControlPosition.TOP_RIGHT].push(document.getElementById('details'));
 
-		// add legend table
-		map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('legend'));
+		// add options box
+		map.controls[google.maps.ControlPosition.TOP_LEFT].push(document.getElementById('optionsBox'));
 
-		// add beta info table
-		//map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('beta'));
+		// add legend table
+		map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(document.getElementById('legend'));
+
+		// new 2016-05-18
+		// listener to fire after a zoom or move event - we need to figure out what markers are displayed on the current view
+		google.maps.event.addListener(map, 'idle', function() {
+			// console.log('map-idle')
+			updateMappedVolunteers();
+
+			});
+		// end new 2016-05-18
 
 
 		} // end initialize
+
+	function updateMappedVolunteers() {
+			// reset the counter 0 that are inbounds
+			console.log('updateMappedVolunteers-start')
+			inboundsCounter = 0;
+			inboundsUsers = [];
+			$('.phpbbUsers').remove();
+			$('.usernamesForCopy').remove();
+	    	console.log('volunteerMarkers.length: ' + volunteerMarkers.length);
+
+			for(var i = 0; i < volunteerMarkers.length; i++) {
+			   if( map.getBounds().contains(volunteerMarkers[i].getPosition()) ){
+			    	inboundsCounter = inboundsCounter + 1;
+					//console.log('inboundsCounter: ' + inboundsCounter);
+					inboundsUsers.push(volunteerMarkers[i].inboundHtml);
+					// console.log(flightPaths[i].airportLink)
+					// console.log('inboundsUsers.length: ' + inboundsUsers.length);
+					// add to Mapped Volunteers div
+
+					$('<div class=phpbbUsers>' + volunteerMarkers[i].airportLink + ' ' + volunteerMarkers[i].inboundHtml + '</div>').appendTo('#mappedVolunteers');
+					$('<div class=usernamesForCopy >' + volunteerMarkers[i].usernameForCopy + '</div>').appendTo('#hiddenUsernames');
+
+			    }
+			}
+			console.log('updateMappedVolunteers-end')
+		} // end updateMappedVolunteers
+
 
 	function get_checked_radio(radios) {
 	    for (var i = 0; i < radios.length; i++) {
@@ -228,13 +276,17 @@
 					radius: flyingRadius * 1852, // 1852 meters in a nautical mile
 					icon: markerImage,
 					optimized: false,
-					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +  
+					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +
 						'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-						' target="_blank" >' + username + '</a> <br>' + 
+						' target="_blank" >' + username + '</a> <br>' +
 						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
-						pilotInfo + 
+						pilotInfo +
 						'Last visit: ' + lastVisitHuman +
-						'</div> ' 
+						'</div> ' ,
+					inboundHtml: '<a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+						' target="_blank" >' + username + '</a>' ,
+					airportLink: '<a href="http://www.aopa.org/airports/' + airportID + '" target="_blank" >' + airportID + '</a>',
+					usernameForCopy: username + '<br>'
 					});  // end volunteerMarker
 
 				volunteerMarkers.push(volunteerMarker);
@@ -276,7 +328,9 @@
 				volunteerMarker.setMap(map);	
 
 				} // end of for
-				
+
+				updateMappedVolunteers();
+
 			});  	 // end downloadUrl
 
 		// here is where adding to the downloadUrl needs to go
@@ -339,7 +393,11 @@
 						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
 						pilotInfo + 
 						'Last visit: ' + lastVisitHuman +
-						'</div> ' 
+						'</div> ' ,
+					inboundHtml: '<a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+						' target="_blank" >' + username + '</a>' ,
+					airportLink: '<a href="http://www.aopa.org/airports/' + airportID + '" target="_blank" >' + airportID + '</a>',
+					usernameForCopy: username + '<br>'
 					});  // end volunteerMarker
 
 				volunteerMarkers.push(volunteerMarker);
@@ -385,7 +443,8 @@
 			});  	 // end downloadUrl for lat lon
 
 		//  end downloadLatLon
-
+	
+		updateMappedVolunteers();
 
 	}  // end updateVolunteers
 
@@ -437,7 +496,7 @@ function removeFlightPaths() {
 
   </head>
 
-  <body onload="load()">
+  <body >
 
 	<style>
 	html, body {
@@ -448,11 +507,10 @@ function removeFlightPaths() {
 		
 	#legend {
 			background: white;
-			padding: 5px;
-			width: 100px;
+			padding: 10px;
 			border-style: solid;
 			border-color: black;
-			border-width:2px;	
+			border-width:2px;
 		}
 
 	#details {
@@ -470,29 +528,71 @@ function removeFlightPaths() {
 			border-color: black;
 			border-width:2px;	
 		}
-	#beta {
+
+	#mappedVolunteers {
 			background: white;
-			padding: 5px;
-			
+			padding: 10px;
 			border-style: solid;
 			border-color: black;
-			border-width:2px;	
+			border-width:2px;
 		}
 
+	#hiddenUsernames {
+			width: 0px;
+			height: 0px;
+		}
 
 	</style>
 
+	<div id="hiddenUsernames">
+	</div>
+
+	<div id="mappedVolunteers"  >
+			<div style="margin-bottom:5px;font-weight:500;">Mapped volunteers:</div>
+
+			<script>
+				var clipboard = new Clipboard('.btn');
+
+				clipboard.on('success', function(e) {
+				    console.log(e);
+				});
+
+				clipboard.on('error', function(e) {
+				    console.log(e);
+				});
+			</script>
+
+			<div></div>
+			<button class="btn" data-clipboard-action="copy" data-clipboard-target="#hiddenUsernames">Copy usernames to clipboard</button>
+	</div> 
+
 	<div id="details">
-		<div style="font-weight:500;font-size:140%">Trip request details:</div>
-		<div style="font-size:135%" id="tripHTML"></div>
+		<div style="font-weight:500;font-size:125%">Trip request details:</div>
+		<div style="font-size:105%" id="tripHTML"></div>
 	</div>
 
 	<div id="legend">
 		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
-		<div style="float:left;width:30px;height:1em;background-color:#8D00DE;border: 1px solid black;"></div>
-		<div style="float:left;padding-left:5px;"> Northbound</div>
-		<div style="float:left;width:30px;height:1em;background-color:#00AD6E;border: 1px solid black;"></div>
-		<div style="float:left;padding-left:5px;"> Southbound</div>
+	<table>
+		<tr valign="bottom" align="center">
+			<td >
+				<img src="images/icon_plane_house_small.svg" >
+				<div style="padding-left:5px;"> Foster/Pilot</div>
+			</td>
+			<td>
+				<img src="images/icon_house_small.svg" >
+				<div style="padding-left:5px;"> Foster</div>
+			</td>
+			<td>
+				<img src="images/icon_plane_blue_small.svg" >
+				<div style="padding-left:5px;"> Pilot</div>
+			</td>
+			<td>
+				<img src="images/icon_volunteer.svg" >
+				<div style="padding-left:5px;"> Volunteer</div>
+			</td>
+		</tr>
+	</table>
 	</div>
 
 	<div id="optionsBox">
