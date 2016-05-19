@@ -58,12 +58,13 @@ if ($zipCode == ''){
 	$zipCode = 'foo';
 	} 
 	else
-	{	$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, '
+	{	$zipCode = str_replace(',', '\',\'', $zipCode);
+		$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, '
 		. ' fn_distance(a.lat, a.lon, b.lat, b.lon) as distance '
 		. ' FROM airports a, '
-		. ' (select zip, lat, lon from zipcodes where zip in ( ' 
+		. ' (select zip, lat, lon from zipcodes where zip in ( \'' 
 		. $zipCode
-		. ' ) ) b '
+		. '\' ) ) b '
 		. ' HAVING distance < '
 		. $distance
 		. ' ) z ) ' ;
