@@ -55,20 +55,31 @@ if (isset($_GET['distance'])){
 	}
 
 if ($zipCode == ''){
-	$zipCode = 'foo';
+	$zipCode = ' 1 = 0 ';
 	} 
 	else
-	{	$distanceFilterSQL = ' apt_id in (select z.apt_id from (select a.apt_id, a.lat, a.lon, minB.minLat, maxB.maxLat, minB.minLon, maxB.maxLon '
+	{	$zipCode = str_replace(',', '\',\'', $zipCode);
+		$distanceFilterSQL = ' /* this below gets volunteers by airport */  '
+							. ' ( apt_id in (select z1.apt_id from '
+							. ' (select a.apt_id, a.lat, a.lon, minB.minLat, maxB.maxLat, minB.minLon, maxB.maxLon '
 							. ' FROM airports a, '
-							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) as minLon from zipcodes where zip in ( '
-							. $zipCode
-							. ' ) ) minB, '
-                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) as maxLon from zipcodes where zip in ( '
-							. $zipCode
-							. ' ) ) maxB '
+							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) as minLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) minB, '
+                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) as maxLon from zipcodes where zip in ( \'' . $zipcode . '\' ) ) maxB '
 							. ' WHERE CAST(a.lat AS DECIMAL (12 , 6 )) between minB.minLat and maxB.maxLat '
                         	. ' and CAST(a.lon AS DECIMAL (12 , 6 )) between minB.minLon and maxB.maxLon '
-		 				. ' ) z  ) ' ;
+                        	. ' and minB.minLat IS NOT NULL and maxB.maxLat IS NOT NULL'
+		 					. ' ) z1  ) '
+		 					. ' OR /* this below gets volunteers by zipcode */ ' 
+		 					. ' ( zip in (select z2.zip from '
+							. ' (select a.zip, a.lat, a.lon, minB.minLat, maxB.maxLat, minB.minLon, maxB.maxLon '
+							. ' FROM zipcodes a, '
+							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) as minLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) minB, '
+                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) as maxLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) maxB '
+							. ' WHERE CAST(a.lat AS DECIMAL (12 , 6 )) between minB.minLat and maxB.maxLat '
+                        	. ' and CAST(a.lon AS DECIMAL (12 , 6 )) between minB.minLon and maxB.maxLon '
+                        	. ' and minB.minLat IS NOT NULL and maxB.maxLat IS NOT NULL'
+		 					. ' ) z2  ) '
+		 					. ' ) )' ;
 	} 
 
 
@@ -110,8 +121,9 @@ $query = 'select last_visit, last_visit_human, user_id, username, pf_foster_yn, 
 		. 'and '
 		. $distanceFilterSQL ;
 
-//echo $query;
-$result = $mysqli->query($query);
+// echo $query;
+$result = $mysqli->query($query) or die ($mysqli->error);
+
 
 // Start XML file, echo parent node
 header("Content-type: text/xml");
