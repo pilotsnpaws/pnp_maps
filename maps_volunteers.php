@@ -324,6 +324,7 @@ function setAllMap(map) {
 	#hiddenUsernames {
 			width: 0px;
 			height: 0px;
+			font-size: 1%; 
 		}
 
 	</style>

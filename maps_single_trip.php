@@ -540,11 +540,12 @@ function removeFlightPaths() {
 	#hiddenUsernames {
 			width: 0px;
 			height: 0px;
+			font-size: 1%;
 		}
 
 	</style>
 
-	<div id="hiddenUsernames">
+	<div id="hiddenUsernames" >
 	</div>
 
 	<div id="mappedVolunteers"  >

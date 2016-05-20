@@ -1,5 +1,10 @@
 <?php
 
+// this returns volunteers within a box of the send and receiving zip codes
+// this, combined with maps_create_volunteer_locations_xml.php should get all relevant volunteers 
+// except, when a trip is very much n-s or e-w the box isnt that big
+// need to address that - Mike 2016-05-20
+
 //no cache headers 
 header("Expires: Mon, 26 Jul 1990 05:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -63,21 +68,21 @@ if ($zipCode == ''){
 							. ' ( apt_id in (select z1.apt_id from '
 							. ' (select a.apt_id, a.lat, a.lon, minB.minLat, maxB.maxLat, minB.minLon, maxB.maxLon '
 							. ' FROM airports a, '
-							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) as minLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) minB, '
-                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) as maxLon from zipcodes where zip in ( \'' . $zipcode . '\' ) ) maxB '
+							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) - 1 as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) - 1 as minLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) minB, '
+                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) + 1 as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) + 1 as maxLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) maxB '
 							. ' WHERE CAST(a.lat AS DECIMAL (12 , 6 )) between minB.minLat and maxB.maxLat '
                         	. ' and CAST(a.lon AS DECIMAL (12 , 6 )) between minB.minLon and maxB.maxLon '
-                        	. ' and minB.minLat IS NOT NULL and maxB.maxLat IS NOT NULL'
+                        	. ' and minB.minLat IS NOT NULL and maxB.maxLat IS NOT NULL '
 		 					. ' ) z1  ) '
 		 					. ' OR /* this below gets volunteers by zipcode */ ' 
 		 					. ' ( zip in (select z2.zip from '
 							. ' (select a.zip, a.lat, a.lon, minB.minLat, maxB.maxLat, minB.minLon, maxB.maxLon '
 							. ' FROM zipcodes a, '
-							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) as minLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) minB, '
-                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) as maxLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) maxB '
+							. ' (select min(CAST(lat AS DECIMAL (12 , 6 ))) - 1 as minLat, min(CAST(lon AS DECIMAL (12 , 6 ))) - 1 as minLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) minB, '
+                            . ' (select max(CAST(lat AS DECIMAL (12 , 6 ))) + 1 as maxLat, max(CAST(lon AS DECIMAL (12 , 6 ))) + 1 as maxLon from zipcodes where zip in ( \'' . $zipCode . '\' ) ) maxB '
 							. ' WHERE CAST(a.lat AS DECIMAL (12 , 6 )) between minB.minLat and maxB.maxLat '
                         	. ' and CAST(a.lon AS DECIMAL (12 , 6 )) between minB.minLon and maxB.maxLon '
-                        	. ' and minB.minLat IS NOT NULL and maxB.maxLat IS NOT NULL'
+                        	. ' and minB.minLat IS NOT NULL and maxB.maxLat IS NOT NULL '
 		 					. ' ) z2  ) '
 		 					. ' ) )' ;
 	} 
