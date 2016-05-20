@@ -236,7 +236,8 @@
 				};
 			mc = new MarkerClusterer(map, flightPaths, mcOptions);
 
-			updateMappedVolunteers();
+			// commented out so we dont create a div with every volunteer on the map at startup 2016-05-20
+			// updateMappedVolunteers();
 
 			}); // end downloadUrl
 
