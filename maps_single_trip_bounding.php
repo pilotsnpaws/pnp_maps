@@ -19,6 +19,8 @@
 	var max = 1.000035;	
 	var sendZip = '00000';
 	var recZip = '00000' ;
+	var searchBoxDistance = 0.7246; // http://geography.about.com/library/faq/blqzdistancedegree.htm
+
 
 	function gup( name ){
 		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
@@ -128,10 +130,10 @@
 				var topicID = trips[i].getAttribute("topicID");
 				var lastPost = trips[i].getAttribute("lastPost");
 				var lastPostHuman = trips[i].getAttribute("lastPostHuman");
-				var sendLat = trips[i].getAttribute("sendLat");
-				var sendLon = trips[i].getAttribute("sendLon");
-				var recLat = trips[i].getAttribute("recLat");
-				var recLon = trips[i].getAttribute("recLon");
+				var sendLat = parseFloat(trips[i].getAttribute("sendLat"));
+				var sendLon = parseFloat(trips[i].getAttribute("sendLon"));
+				var recLat = parseFloat(trips[i].getAttribute("recLat"));
+				var recLon = parseFloat(trips[i].getAttribute("recLon"));
 				sendZip = trips[i].getAttribute("sendZip");
 				recZip = trips[i].getAttribute("recZip");
 				var sendCity = trips[i].getAttribute("sendCity");
@@ -155,11 +157,153 @@
 					strokeWeight: 3,
 					});
 
+				var tripCenterLon = (sendLon+recLon)/2 ;
+				var tripCenterLat = (sendLat+recLat)/2 ;
+				console.log('center coords: '  + tripCenterLat + ", "  + tripCenterLon);
+
+				// put a marker at center of trip for testing purposes
+				var centerMarker = new google.maps.Marker({
+					map: map,
+					position: { lat: 29.33, lng: -83.56} 
+						// lat: tripCenterLat,
+						// lon: tripCenterLon
+						// }
+					});  // end centerMarker
+
+				centerMarker.setMap(map);
+				// end testing center marker
+
+				var searchBoxCoordinates = [
+					// new google.maps.LatLng(sendLat-1, sendLon-1),
+					// new google.maps.LatLng(sendLat-1, sendLon+1),
+					// new google.maps.LatLng(sendLat+1, sendLon+1),
+					// new google.maps.LatLng(sendLat+1, sendLon-1),
+					// new google.maps.LatLng(recLat-1, recLon-1),
+					// new google.maps.LatLng(recLat-1, recLon+1),
+					// new google.maps.LatLng(recLat+1, recLon+1),
+					// new google.maps.LatLng(recLat+1, recLon-1)
+					];
+
+				// southwest trip
+				// http://localhost/maps/maps_single_trip.php?topic=40204
+				if (sendLat > recLat && sendLon > recLon) {
+					console.log('Southwest');
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat-searchBoxDistance, recLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat-searchBoxDistance, recLon));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon));
+				}
+				// northwest trip
+				// http://localhost/maps/maps_single_trip.php?topic=40210
+				if (sendLat < recLat && sendLon > recLon) {
+					console.log('Northwest');
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat-searchBoxDistance, recLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat, recLon-searchBoxDistance));
+				}
+
+				// Northeast trip
+				// http://localhost/maps/maps_single_trip.php?topic=40205
+				// http://localhost/maps/maps_single_trip.php?topic=40206
+				if (sendLat < recLat && sendLon < recLon) {
+					console.log('Northeast');
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat-searchBoxDistance, recLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat, recLon+searchBoxDistance));
+				}
+				// Southeast trip
+				// http://localhost/maps/maps_single_trip.php?topic=40203
+				// http://localhost/maps/maps_single_trip.php?topic=40233
+				// http://localhost/maps/maps_single_trip.php?topic=40207
+				if (sendLat > recLat && sendLon < recLon) {
+					console.log('Southeast');
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat, sendLon-searchBoxDistance));
+					// remove a point if the distances are short, like under 175 miles
+					// see http://localhost/maps/maps_single_trip.php?topic=40214
+					// if ((sendLat - recLat) > 2.5) searchBoxCoordinates.push(new google.maps.LatLng(sendLat-searchBoxDistance, sendLon));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon));
+					searchBoxCoordinates.push(new google.maps.LatLng(sendLat+searchBoxDistance, sendLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat-searchBoxDistance, recLon-searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat-searchBoxDistance, recLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat, recLon+searchBoxDistance));
+					searchBoxCoordinates.push(new google.maps.LatLng(recLat+searchBoxDistance, recLon+searchBoxDistance));
+				}
+
+				console.log('lat diffs ' + (sendLat - recLat))
+
+				console.log('searchBoxCoordinates length: ' + searchBoxCoordinates.length);
+
+				var searchBoxCoordinatesOrdered = [];
+				var searchBoxCoordinatesNW = [];
+				var searchBoxLat = 0;
+				var searchBoxLon = 0;
+				var searchBoxDegrees = [];
+
+				console.log('searchBoxDegrees length: ' + searchBoxDegrees.length);
+
+				// find the degrees from center of each position
+				for (var i = 0; i < searchBoxCoordinates.length; i++) {
+					searchBoxLat = searchBoxCoordinates[i].lat();
+					searchBoxLon = searchBoxCoordinates[i].lng();
+					console.log('searchBoxCoordinates coord: ' + i + ' coords: ' + searchBoxLat + ', ' + searchBoxLon );
+					var searchMarkerDegrees = (Math.round(180+Math.atan2(tripCenterLon - searchBoxLon, tripCenterLat - searchBoxLat) * 180 / Math.PI));
+					console.log('searchMarkerDegrees: ' + searchMarkerDegrees);
+					searchBoxDegrees.push( {lat: searchBoxLat, lon: searchBoxLon, degrees: searchMarkerDegrees } );
+					console.log(searchBoxDegrees[searchBoxDegrees.length-1]);
+
+					} // end finding degrees
+
+
+				// sort by degrees so that a polygon can be created, as google maps/mysql requires it to be in order
+				searchBoxDegrees.sort(function(a,b) {return a.degrees - b.degrees});
+				// push each lat/lon in order to an array as google coordinates
+
+				var searchBoxCoordsString = '';
+
+				for (var i = 0; i < searchBoxDegrees.length; i++) {
+					console.log(searchBoxDegrees[i]);
+					searchBoxCoordinatesOrdered.push(new google.maps.LatLng(searchBoxDegrees[i].lat, searchBoxDegrees[i].lon));
+					// create a string of lon lat for use in mysql
+					searchBoxCoordsString = searchBoxCoordsString + searchBoxDegrees[i].lon.toFixed(2) + ' ' + searchBoxDegrees[i].lat.toFixed(2) + ', ' ;
+					}
+
+				// mysql requires the polygon to be closed, thus we put the starting coord point at the end
+				searchBoxCoordsString = searchBoxCoordsString + searchBoxDegrees[0].lon.toFixed(2) + ' ' + searchBoxDegrees[0].lat.toFixed(2) ; 
+				console.log(searchBoxCoordsString);
+
+
+				// make a polygon that shows the search radius
+				var searchBoxPolygon = new google.maps.Polygon({
+					path: searchBoxCoordinatesOrdered,
+					strokeColor: 'yellow',
+					strokeOpacity: 0.8,
+					strokeWeight: 2,
+					fillColor: 'green',
+					fillOpacity: 0.15
+					});
+
 				flightPaths.push(flightPath);
+				flightPaths.push(searchBoxPolygon);
 
 				// from http://stackoverflow.com/questions/16642451/center-and-auto-zoom-google-map
 				//  Make an array of the LatLng's of the markers you want to show
-				var LatLngList = new Array (new google.maps.LatLng(sendLat, sendLon), new google.maps.LatLng(recLat, recLon));
+				var LatLngList = searchBoxCoordinates ; // new Array (new google.maps.LatLng(sendLat, sendLon), new google.maps.LatLng(recLat, recLon));
 				//  Create a new viewpoint bound
 				var bounds = new google.maps.LatLngBounds ();
 				//  Go through each...
@@ -208,6 +352,7 @@
 					});
 
 				flightPath.setMap(map);	
+				searchBoxPolygon.setMap(map);	
 				updateVolunteers();
 				}
 			});

@@ -1,7 +1,7 @@
 /* this view supports create_xml.php 
 it provides the topic and sending/receiving lat/lon for forum 5, the request forum
 */
-alter view vw_lines
+create view vw_lines
 AS
 select DISTINCT date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) as last_post,
     DATE_FORMAT(date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND )
@@ -35,9 +35,7 @@ where 1=1
 	AND t.topic_last_post_time > UNIX_TIMESTAMP(date_add(CURRENT_TIMESTAMP, INTERVAL -1 YEAR)) /* limit to last year for performance reasons */
 	-- and t.forum_id = 5 
     and t.pnp_sendZip is not null
-    and t.pnp_recZip is not null
-
-select * from vw_lines
+    and t.pnp_recZip is not null;
 
 /* prereqs for vw_lines to work */
 

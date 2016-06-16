@@ -1,4 +1,3 @@
-use pnp_forum_0420;
 
 SELECT u.user_id, u.username, u.user_email, u.user_notify_type,	t.pnp_sendZip , t.pnp_recZip, 
 			sendzip.lat as sendLat, sendzip.lon as sendLon, sendzip.city as sendcity, sendzip.state as sendstate, 

@@ -1,7 +1,9 @@
 -- view created 2013, MJG. Updated 2016-03-30
 
 -- drop view vw_volunteers
-    
+-- drop table vw_volunteers
+
+
 create view vw_volunteers
 AS
 select
@@ -10,6 +12,7 @@ select
 	u.user_id AS user_id,
 	u.user_regdate AS user_regdate,
 	u.username AS username,
+    u.user_email as user_email,
 	pf.pf_flying_radius AS pf_flying_radius,
 	pf.pf_foster_yn AS pf_foster_yn,
 	pf.pf_pilot_yn AS pf_pilot_yn,
@@ -28,3 +31,4 @@ from phpbb_users u
 where 1=1
 	and (pf.pf_airport_id <> '' or pf.pf_zip_code <> '') /* exclude users who didnt provide airport or zip code */ 
 	and u.user_inactive_reason = 0 /* added 12/26/2013 to exclude inactive users */
+    

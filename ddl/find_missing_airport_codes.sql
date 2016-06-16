@@ -23,7 +23,9 @@ INSERT INTO `airports`
 `state`,
 country_code)
 VALUES
-('T57','Garland/DFW Heloplex', '32.8876250' ,'-96.6836075', 'Garland', 'TX', 'US' ),
+('KBXM','Brunswick Executive', '43.8923551' ,'-69.9388297', 'Brunswick', 'ME', 'US' )
+
+,
 ('T57','Garland/DFW Heloplex', '32.8876250' ,'-96.6836075', 'Garland', 'TX', 'US' )
 ;
 
@@ -42,3 +44,5 @@ select * from phpbb_profile_fields_data where user_id = 8065
 update phpbb_profile_fields_data 
 set pf_airport_id = 'N10'
 where pf_airport_id = 'KN10'
+
+select * from phpbb_topics where forum_id = 5 order by topic_id desc
