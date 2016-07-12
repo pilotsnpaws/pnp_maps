@@ -32,5 +32,4 @@ from phpbb_users u
 	left join zipcodes z on z.zip = pf.pf_zip_code
 where 1=1
 	and (pf.pf_airport_id <> '' or pf.pf_zip_code <> '') /* exclude users who didnt provide airport or zip code */ 
-	and u.user_inactive_reason = 0 /* added 12/26/2013 to exclude inactive users */
-    
+
