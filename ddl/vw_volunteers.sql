@@ -12,7 +12,7 @@ select
 	u.user_id AS user_id,
 	u.user_regdate AS user_regdate,
 	u.username AS username,
-    u.user_email as user_email,
+    	u.user_email as user_email,
 	pf.pf_flying_radius AS pf_flying_radius,
 	pf.pf_foster_yn AS pf_foster_yn,
 	pf.pf_pilot_yn AS pf_pilot_yn,
@@ -22,7 +22,9 @@ select
 	cast(coalesce(a.lat,convert(z.lat using latin1)) as decimal(12,6)) AS lat,
 	cast(coalesce(a.lon,convert(z.lon using latin1)) as decimal(12,6)) AS lon,
 	coalesce(a.city,convert(z.city using latin1)) AS city,
-	coalesce(a.state,convert(z.state using latin1)) AS state
+	coalesce(a.state,convert(z.state using latin1)) AS state,
+	u.user_inactive_reason, 
+	u.user_type
 from phpbb_users u
 	join phpbb_profile_fields_data pf on u.user_id = pf.user_id
 	left join airports a on a.apt_id = pf.pf_airport_id
