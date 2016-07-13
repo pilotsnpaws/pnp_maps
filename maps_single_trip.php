@@ -207,8 +207,9 @@
 
 					});
 
-				flightPath.setMap(map);	
-				updateVolunteers();
+                                flightPath.setMap(map);
+                        // not showing volunteers at request of folks that it makes it cluttered. have to click search
+                                // updateVolunteers();
 				}
 			});
 	} // end updateTrips
