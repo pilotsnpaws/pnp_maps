@@ -1,13 +1,13 @@
 <!DOCTYPE html >
   <head>
-	<link rel="shortcut icon" href="http://www.pilotsnpaws.org/forum/favicon.ico" />
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-    <title>Pilotsnpaws.org Volunteer Location Map</title>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k"></script>
-    <script src="js/markerclusterer.js" type="text/javascript"></script>
-    <script src="js/jquery.min.js" type="text/javascript"></script>
-    <script src="js/clipboard.min.js" type="text/javascript"></script>
+	<link rel="shortcut icon" href="/favicon.ico" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<title>Pilotsnpaws.org Volunteer Location Map</title>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k"></script>
+	<script src="js/markerclusterer.js" type="text/javascript"></script>
+	<script src="js/jquery.min.js" type="text/javascript"></script>
+	<script src="js/clipboard.min.js" type="text/javascript"></script>
 
 
 
