@@ -1,6 +1,6 @@
 <?php
 
 $environment = 'dev' ;
-$configPath  = '/users/michaelgreen/projects/pnp_forum/config.php' ;
+$configPath  = 'ca_dev/local_config.php' ;
 
 ?>
