@@ -363,7 +363,7 @@ function setAllMap(map) {
 					return false;
 			};
 		};	
-		</script>l
+		</script>
 		
 	<div id="legend">
 		<span id='close'>X</span>
