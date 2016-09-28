@@ -42,11 +42,7 @@
 			center: new google.maps.LatLng(37.000000,-95.000000),
 			scaleControl: true,
 			mapTypeId: google.maps.MapTypeId.ROADMAP,
-		    mapTypeControl: true,
-    		mapTypeControlOptions: {
-        		style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-        		position: google.maps.ControlPosition.TOP_CENTER
-    			}
+		  mapTypeControl: false
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
 
@@ -313,6 +309,13 @@ function setAllMap(map) {
 			border-color: black;
 			border-width:2px;
 		}
+		
+	#close {
+			float:right;
+			display:inline-block;
+			padding:2px 5px;
+			background:#ccc;
+	}
 
 	#mappedVolunteers {
 			background: white;
@@ -352,15 +355,18 @@ function setAllMap(map) {
 			<button class="btn" data-clipboard-action="copy" data-clipboard-target="#hiddenUsernames">Copy usernames to clipboard</button>
 	</div> 
 
+	<script>
+		window.onload = function(){
+			document.getElementById('close').onclick = function(){
+					this.parentNode.parentNode
+					.removeChild(this.parentNode);
+					return false;
+			};
+		};	
+		</script>l
+		
 	<div id="legend">
-	<table>
-		<tr valign="bottom" align="center">
-			<td align="left">
-				<A href="/maps_more/mapsmore_volunteersAirport.php">Search pilots by airport code</A><br>
-				<A href="/maps_more/mapsmore_volunteersZip.php">Search pilots by zip code</A>
-			</td>
-		</tr>
-	</table>
+		<span id='close'>X</span>
 		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
 	<table>
 		<tr valign="bottom" align="center">
@@ -382,6 +388,14 @@ function setAllMap(map) {
 			</td>
 		</tr>
 	</table>
+	<table width="100%"> 
+		<tr valign="bottom" align="center">
+			<td align="left">
+				<A href="/maps_more/mapsmore_volunteersAirport.php">Search pilots by airport code</A><br>
+				<A href="/maps_more/mapsmore_volunteersZip.php">Search pilots by zip code</A>
+			</td>
+		</tr>
+	</table> 
 	</div>
 
 
