@@ -3,8 +3,8 @@
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-	<title>Pilotsnpaws.org single trip map</title>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&libraries=geometry"></script>
+	<title>Pilots-N-Paws single trip map</title>
+
 	<script src="js/jquery.min.js" type="text/javascript"></script>
 	<script src="js/clipboard.min.js" type="text/javascript"></script>
 	<script type="text/javascript">
@@ -19,7 +19,9 @@
 	var max = 1.000035;	
 	var sendZip = '00000';
 	var recZip = '00000' ;
+  var defaultTopic = '41217' // this is in case one isn't provided, we'll show an old one
 
+  // get URL parameter 
 	function gup( name ){
 		name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");  
 		var regexS = "[\\?&]"+name+"=([^&#]*)";  
@@ -30,18 +32,19 @@
 
 	function initialize() {
 		var mapOptions = {
+        zoom: 5,
 		    zoomControl: true,
 		    zoomControlOptions: {
 		        position: google.maps.ControlPosition.RIGHT_BOTTOM
 		    },
 		    streetViewControl: false,
-			center: new google.maps.LatLng(37.000000,-95.000000),
-			scaleControl: true,
-			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			  center: new google.maps.LatLng(37.000000,-95.000000),
+			  scaleControl: true,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
 		    mapTypeControl: true,
     		mapTypeControlOptions: {
         		style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-        		position: google.maps.ControlPosition.TOP_CENTER
+        		position: google.maps.ControlPosition.BOTTOM_CENTER
     			}
 		  };
 		map = new google.maps.Map(document.getElementById('gMap'),mapOptions);
@@ -106,8 +109,7 @@
 		}
 	    }
 	} // end get_checked_radio
-
-
+  
 	function updateTrips() {
 
 		removeFlightPaths();
@@ -116,6 +118,13 @@
 		// alert(topic);
 		
 		var topic_param = gup('topic');
+		// if topic isn't provided, use an old trip as not to fail
+		if (topic_param.length == 0)
+      {
+        console.log('No topic provided in URL. Showing old trip as default.');
+        topic_param = defaultTopic;
+      }
+    
 		var searchURL = "maps_create_single_trip_xml.php?topic=" + topic_param;
 		downloadUrl(searchURL, function(data) {
 		var xml = data.responseXML;
@@ -123,6 +132,12 @@
 		var pathInfoWindow = new google.maps.InfoWindow();
 			
 		var trips = xml.documentElement.getElementsByTagName("trip");
+    // check if query returned anything
+      if (trips.length == 0)
+        {
+          console.log('xml returned 0 results. expecting single trip detail. nothing to display ');
+        }
+      
 			for (var i = 0; i < trips.length; i++) {
 				var topic = trips[i].getAttribute("topicTitle");
 				var topicID = trips[i].getAttribute("topicID");
@@ -168,7 +183,7 @@
 				  bounds.extend (LatLngList[i]);
 					}
 				//  Fit these bounds to the map
-				map.fitBounds (bounds);
+				map.fitBounds(bounds);
 
 				// do length calcs, make a dummy path to get length.. if not, cant calc length in the html string below
 				var lengthFlightPath = new google.maps.Polyline({
@@ -207,14 +222,13 @@
 
 					});
 
-                                flightPath.setMap(map);
-                        // not showing volunteers at request of folks that it makes it cluttered. have to click search
-                                // updateVolunteers();
+          flightPath.setMap(map);
+          // not showing volunteers at request of folks that it makes it cluttered. have to click search
+          // updateVolunteers();
 				}
 			});
 	} // end updateTrips
 		
-
 	function updateVolunteers() {
 	
 		removeVolunteers();
@@ -489,7 +503,7 @@ function removeFlightPaths() {
 
 	function doNothing() {}
 	
-	google.maps.event.addDomListener(window, 'load', initialize);
+	//google.maps.event.addDomListener(window, 'load', initialize);
 
     //]]>
 
@@ -505,13 +519,24 @@ function removeFlightPaths() {
 		padding:0;
 		height:100%; /* needed for container min-height */
 		}	
-		
+
+  #gMap {
+      height: 100%;
+    }
+    
 	#legend {
 			background: white;
 			padding: 10px;
 			border-style: solid;
 			border-color: black;
 			border-width:2px;
+		}
+		
+	#close {
+			float:right;
+			display:inline-block;
+			padding:2px 5px;
+			background:#ccc;
 		}
 
 	#details {
@@ -573,7 +598,18 @@ function removeFlightPaths() {
 		<div style="font-size:105%" id="tripHTML"></div>
 	</div>
 
+	<script>
+			window.onload = function(){
+				document.getElementById('close').onclick = function(){
+						this.parentNode.parentNode
+						.removeChild(this.parentNode);
+						return false;
+				};
+			};	
+	</script>
+		
 	<div id="legend">
+		<span id='close'>X</span>
 		<div style="margin-bottom:5px;font-weight:500;">Legend:</div>
 	<table>
 		<tr valign="bottom" align="center">
@@ -595,6 +631,14 @@ function removeFlightPaths() {
 			</td>
 		</tr>
 	</table>
+	<table width="100%"> 
+		<tr valign="bottom" align="center">
+			<td align="left">
+				<A href="/maps_more/mapsmore_volunteersAirport.php">Search pilots by airport code</A><br>
+				<A href="/maps_more/mapsmore_volunteersZip.php">Search pilots by zip code</A>
+			</td>
+		</tr>
+	</table> 
 	</div>
 
 	<div id="optionsBox">
@@ -637,10 +681,14 @@ function removeFlightPaths() {
 	</div>	
 -->
 
-    <div id="gMap" style="width: 100%; height: 100%;"></div>
+    <div id="gMap"></div>
+    
   </body>
 
 </html>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD7Dabm2M9XvDVk27xCZomEZ1uJFcJHG4k&libraries=geometry&callback=initialize">
+</script>
 
 	<!-- Google analytics added 2016-03-29 --> 
 	<script>
