@@ -50,7 +50,7 @@ if (mysqli_connect_errno($mysqli))
   echo "Failed to connect to MySQL: " . mysqli_connect_error();
   } else { } ;
 
-$query = 'select last_post, last_post_human, topic_id, topic_title, pnp_sendZip, ' 
+$query = 'select DISTINCT last_post, last_post_human, topic_id, topic_title, pnp_sendZip, ' 
 		. 'sendLat, sendLon, pnp_recZip, recLat, recLon, sendCity, recCity '  
 		. 'from vw_lines ' 
 		. 'where topic_id = '

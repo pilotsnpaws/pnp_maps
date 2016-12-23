@@ -1,9 +1,11 @@
 /* this view supports create_xml.php 
 it provides the topic and sending/receiving lat/lon for forum 5, the request forum
+2016-12-23 - removed DISTINCT from vw_lines as it was causing performance issues within the view, but not when calling the view. Odd.
+
 */
 create view vw_lines
 AS
-select DISTINCT date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) as last_post,
+select date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND ) as last_post,
     DATE_FORMAT(date_add('1969-12-31 20:00:00', INTERVAL t.topic_last_post_time SECOND )
         , '%a, %D %b %Y @ %h:%i%p') AS last_post_human,
     t.topic_id, t.topic_title,
