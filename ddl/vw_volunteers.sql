@@ -31,5 +31,3 @@ from phpbb_users u
 	/* airport IDs are mixed case when user enters them, need to upper case occasionally, joining on UPPER is SLLLOOOW */
 	left join zipcodes z on z.zip = pf.pf_zip_code
 where 1=1
-	and (pf.pf_airport_id <> '' or pf.pf_zip_code <> '') /* exclude users who didnt provide airport or zip code */ 
-
