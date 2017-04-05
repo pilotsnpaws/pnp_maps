@@ -31,7 +31,7 @@ if (mysqli_connect_errno())
 
     <head>
         <title>PNP|Volunteers around an airport</title></head>
-        <link rel="shortcut icon" href="http://www.pilotsnpaws.org/forum/favicon.ico">
+        <link rel="shortcut icon" href="/forum/favicon.ico">
     </head>
 
     <style>
@@ -105,12 +105,14 @@ if (mysqli_connect_errno())
     echo $lineBreak ; 
 
     $query = 'select user_id, username, user_email, pf_flying_radius, fn_distance(a.lat, a.lon, v.lat,v.lon) as distance, '
-    . ' a.apt_id AS from_apt, a.apt_id, a.apt_name, a.city, last_visit_human, v.apt_id AS vol_apt_id, v.apt_name AS vol_apt_name, v.city AS vol_city ' 
+    . ' a.apt_id AS from_apt, a.apt_id, a.apt_name, a.city, last_visit_human, v.apt_id AS vol_apt_id, ' 
+		.	' v.apt_name AS vol_apt_name, v.city AS vol_city, v.user_inactive_reason ' 
     . ' from vw_volunteers v, '
     . ' airports a ' 
-    . ' where pf_pilot_yn = 1 ' 
+    . ' where pf_pilot_yn = 1 '  // only show pilots
     . ' and a.apt_id = "' . $airportCode . '" '
     . ' and fn_distance(a.lat, a.lon, v.lat,v.lon) < ' . $miles 
+		. ' and user_inactive_reason = 0 ' // only show active users
     . ' order by 4,9 ' ; 
 
     if ( $debug == 'yes') echo 'Debug: Yes' . $lineBreak . $lineBreak ;
@@ -141,10 +143,10 @@ if (mysqli_connect_errno())
         $airportName = $row['vol_apt_name'];
         $airportCity = $row['vol_city'];
         $lastVisitDate = $row['last_visit_human'];
-        echo '<tr><td><a href="http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' . 
+        echo '<tr><td><a href="/forum/memberlist.php?mode=viewprofile&u=' . 
 						$user_id . '" target=_blank>' . $username . '</a>' . $colBreak . $email .
 						$colBreak . $flying_radius . 
-						$colBreak . $distance . $colBreak . '<a href="http://www.aopa.org/airports/' . 
+						$colBreak . $distance . $colBreak . '<a href="https://www.aopa.org/airports/' . 
 						$airportCode . '" target="_blank">' . $airportCode . '</a>' . $colBreak . $airportName . 
             $colBreak . $airportCity . $colBreak . $lastVisitDate . '</td></tr>' ;
 
