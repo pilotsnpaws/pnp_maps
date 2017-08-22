@@ -6,6 +6,9 @@
 
 // include the phpbb forum config for db connection
 include ( "../forum/config.php");
+// get link for goign to user profile, kept in config.php as it changes with new releases sometimes
+$profileLinkConfig = $profileLink;
+
 $lineBreak = '<br>';
 
 $con = mysqli_connect($dbhost,$dbuser,$dbpasswd,$dbname);
@@ -102,7 +105,12 @@ if (mysqli_connect_errno())
     echo 'Showing pilots within ' . $miles . ' miles of zip code ' . $zipCode ;
     echo $lineBreak ; 
 
-    $query = 'select v.user_id, v.username, v.user_email, v.pf_flying_radius, fn_distance(a.lat, a.lon, v.lat,v.lon) as distance, '
+    // sql injection protection
+    $zipCode = $con->real_escape_string($zipCode);
+    $miles = $con->real_escape_string($miles);
+
+    $query = 'select v.user_id, v.username, v.user_email, v.pf_flying_radius, '
+    . ' fn_distance(a.lat, a.lon, v.lat,v.lon) as distance, '
     . ' v.apt_id as from_apt, v.apt_id, v.apt_name, v.city, v.last_visit_human '
     . ' from vw_volunteers v, '
     . ' zipcodes a '
@@ -140,7 +148,7 @@ if (mysqli_connect_errno())
         $airportName = $row['apt_name'];
         $airportCity = $row['city'];
         $lastVisitDate = $row['last_visit_human'];
-        echo '<tr><td><a href="/forum/memberlist.php?mode=viewprofile&u=' . $user_id . '" target=_blank>' . $username . '</a>' . 
+        echo '<tr><td><a href="' . $profileLinkConfig . $user_id . '" target=_blank>' . $username . '</a>' . 
             $colBreak . $email . 
             $colBreak . $flying_radius . $colBreak . $distance . 
             $colBreak . '<a href="https://www.aopa.org/airports/' . 

@@ -4,6 +4,9 @@
 
 // include the phpbb forum config for db connection
 include ( "../forum/config.php");
+// get link for goign to user profile, kept in config.php as it changes with new releases sometimes
+$profileLinkConfig = $profileLink;
+
 $lineBreak = '<br>';
 
 $con = mysqli_connect($dbhost,$dbuser,$dbpasswd,$dbname);
@@ -30,7 +33,7 @@ if (mysqli_connect_errno())
 
     <head>
         <title>PNP|Volunteers around a zipcode</title></head>
-        <link rel="shortcut icon" href="http://www.pilotsnpaws.org/forum/favicon.ico">
+        <link rel="shortcut icon" href="/forum/favicon.ico">
     </head>
 
     <style>
@@ -100,6 +103,10 @@ if (mysqli_connect_errno())
     echo 'Showing pilots within ' . $miles . ' miles of zip code ' . $zipCode ;
     echo $lineBreak ; 
 
+    // sql injection protection
+    $zipCode = $con->real_escape_string($zipCode);
+    $miles = $con->real_escape_string($miles);
+        
     $query = 'select v.user_id, v.username, v.pf_flying_radius, fn_distance(a.lat, a.lon, v.lat,v.lon) as distance, '
     . ' v.apt_id as from_apt, v.apt_id, v.apt_name, v.city, v.last_visit_human '
     . ' from vw_volunteers v, '
@@ -107,7 +114,7 @@ if (mysqli_connect_errno())
     . ' where pf_pilot_yn = 1 '
     . ' and a.zip = "' . $zipCode . ' " '
     . ' and fn_distance(a.lat, a.lon, v.lat,v.lon) < ' . $miles
-    . ' order by 4,9 ' ;
+    . ' order by distance,last_visit_human ' ;
 
     if ( $debug == 'yes') echo 'Debug: Yes' . $lineBreak . $lineBreak ;
 	if ( $debug == "yes") echo $query . $lineBreak;
@@ -137,7 +144,7 @@ if (mysqli_connect_errno())
         $airportName = $row['apt_name'];
         $airportCity = $row['city'];
         $lastVisitDate = $row['last_visit_human'];
-        echo '<tr><td><a href="http://www.pilotsnpaws.org/forum/memberlist.php?mode=viewprofile&u=' . $user_id . '" target=_blank>' . $username . '</a>' . $colBreak . $flying_radius . $colBreak . $distance . $colBreak . '<a href="http://www.aopa.org/airports/' . $airportCode . '" target="_blank">' . $airportCode . '</a>' . $colBreak . $airportName . 
+        echo '<tr><td><a href="'  . $profileLinkConfig  . $user_id . '" target=_blank>' . $username . '</a>' . $colBreak . $flying_radius . $colBreak . $distance . $colBreak . '<a href="http://www.aopa.org/airports/' . $airportCode . '" target="_blank">' . $airportCode . '</a>' . $colBreak . $airportName . 
             $colBreak . $airportCity . $colBreak . $lastVisitDate . '</td></tr>' ;
 
     }

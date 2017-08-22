@@ -4,6 +4,9 @@
 
 // include the phpbb forum config for db connection
 include ( "../forum/config.php");
+// get link for goign to user profile, kept in config.php as it changes with new releases sometimes
+$profileLinkConfig = $profileLink;
+
 $lineBreak = '<br>';
 
 $con = mysqli_connect($dbhost,$dbuser,$dbpasswd,$dbname);
@@ -104,9 +107,15 @@ if (mysqli_connect_errno())
     echo 'Showing pilots within ' . $miles . ' miles of airport code ' . $airportCode ;
     echo $lineBreak ; 
 
-    $query = 'select user_id, username, user_email, pf_flying_radius, fn_distance(a.lat, a.lon, v.lat,v.lon) as distance, '
-    . ' a.apt_id AS from_apt, a.apt_id, a.apt_name, a.city, last_visit_human, v.apt_id AS vol_apt_id, ' 
-		.	' v.apt_name AS vol_apt_name, v.city AS vol_city, v.user_inactive_reason ' 
+    // sql injection protection
+    $airportCode = $con->real_escape_string($airportCode);
+    $miles = $con->real_escape_string($miles);
+
+    $query = 'select user_id, username, user_email, pf_flying_radius, fn_distance(a.lat, a.lon, '
+    . ' v.lat,v.lon) as distance, '
+    . ' a.apt_id AS from_apt, a.apt_id, a.apt_name, a.city, last_visit_human, ' 
+    . ' v.apt_id AS vol_apt_id, ' 
+	. ' v.apt_name AS vol_apt_name, v.city AS vol_city, v.user_inactive_reason ' 
     . ' from vw_volunteers v, '
     . ' airports a ' 
     . ' where pf_pilot_yn = 1 '  // only show pilots
@@ -143,7 +152,7 @@ if (mysqli_connect_errno())
         $airportName = $row['vol_apt_name'];
         $airportCity = $row['vol_city'];
         $lastVisitDate = $row['last_visit_human'];
-        echo '<tr><td><a href="/forum/memberlist.php?mode=viewprofile&u=' . 
+        echo '<tr><td><a href="' .  $profileLinkConfig .
 						$user_id . '" target=_blank>' . $username . '</a>' . $colBreak . $email .
 						$colBreak . $flying_radius . 
 						$colBreak . $distance . $colBreak . '<a href="https://www.aopa.org/airports/' . 
