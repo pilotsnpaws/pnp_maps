@@ -113,7 +113,7 @@ if (mysqli_connect_errno())
     . ' and a.apt_id = "' . $airportCode . '" '
     . ' and fn_distance(a.lat, a.lon, v.lat,v.lon) < ' . $miles 
 		. ' and user_inactive_reason = 0 ' // only show active users
-    . ' order by 4,9 ' ; 
+    . ' order by distance,last_visit_human ' ; 
 
     if ( $debug == 'yes') echo 'Debug: Yes' . $lineBreak . $lineBreak ;
 	if ( $debug == "yes") echo $query . $lineBreak;
