@@ -138,6 +138,25 @@
           console.log('xml returned 0 results. expecting single trip detail. nothing to display ');
         }
       
+		// radians to degrees
+		function toDeg(rad) {
+			return rad * 180 / Math.PI;
+		}
+
+		// degrees to radians
+		function toRad(deg) {
+			return deg * Math.PI / 180;
+		}
+
+		// calulate the flight direction
+		function getBearing(lat1, lon1, lat2, lon2) {
+			var d = toRad((lon2 - lon1));
+			var y = Math.sin(d) * Math.cos(toRad(lat2));
+			var x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) - Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(d);
+			var brng = toDeg(Math.atan2(y, x));
+			return (360 + brng) % 360;
+		}
+
 			for (var i = 0; i < trips.length; i++) {
 				var topic = trips[i].getAttribute("topicTitle");
 				var topicID = trips[i].getAttribute("topicID");
@@ -155,19 +174,27 @@
 					new google.maps.LatLng(sendLat, sendLon),
 					new google.maps.LatLng(recLat, recLon),
 					];
-				if (sendLat < recLat) 
-						// south to north trip
-						{ var directionColor = '#8D00DE' ; // purple
-						}
-					else  // north to south trip
-						{ var directionColor = '#00AD6E'; // greenish
-						}
+
+				// determine color for flight direction
+				var bearing = getBearing(sendLat, sendLon, recLat, recLon);
+				if (bearing >= 0 && bearing < 180)
+					// 0-179 deg (Eastbound)
+					{ var directionColor = '#00AD6E'; // greenish
+					}
+				else
+					// 180-359 deg (Westbound)
+					{ var directionColor = '#8D00DE'; // purple
+					}
+
+				// show direction of flight
+				var lineType = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW };
 				
 				var flightPath = new google.maps.Polyline({
 					path: flightPlanCoordinates,
 					strokeColor: directionColor,
+					icons: [{ icon: lineType, offset: '100%' }],
 					strokeOpacity: 1.0,
-					strokeWeight: 3,
+					strokeWeight: 2,
 					});
 
 				flightPaths.push(flightPath);
