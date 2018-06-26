@@ -195,6 +195,7 @@
 					icons: [{ icon: lineType, offset: '100%' }],
 					strokeOpacity: 1.0,
 					strokeWeight: 2,
+					geodesic : true,
 					});
 
 				flightPaths.push(flightPath);
