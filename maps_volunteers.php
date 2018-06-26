@@ -25,6 +25,8 @@
 	var min = .999965;
 	var max = 1.000035;
 
+	var centerOfUS = new google.maps.LatLng(37.000000,-95.000000) ; 
+
 	// support testing visible counter
 	var inboundsCounter = 0;
 	var inboundsUsers = [];
@@ -39,7 +41,7 @@
 		        position: google.maps.ControlPosition.RIGHT_BOTTOM
 		    },
 		    streetViewControl: false,
-			center: new google.maps.LatLng(37.000000,-95.000000),
+			center: centerOfUS,
 			scaleControl: true,
 			mapTypeId: google.maps.MapTypeId.ROADMAP,
 		  mapTypeControl: false
@@ -122,107 +124,113 @@
 
 		var volunteers = xml.documentElement.getElementsByTagName("volunteer");
 
-			for (var i = 0; i < volunteers.length; i++) {
-				var username = volunteers[i].getAttribute("username");
-				var userID = volunteers[i].getAttribute("userID");
-				var lastVisit = volunteers[i].getAttribute("lastVisit");
-				var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
-				var foster = volunteers[i].getAttribute("foster");
-				var pilot = volunteers[i].getAttribute("pilot");
-				var flyingRadius= volunteers[i].getAttribute("flyingRadius");
-				var airportID = volunteers[i].getAttribute("airportID");
-				var airportName = volunteers[i].getAttribute("airportName");
-				var zip = volunteers[i].getAttribute("zip");
-				var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
-				var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
-				var city = volunteers[i].getAttribute("city");
-				var state = volunteers[i].getAttribute("state");
-				var volunteerCoordinates = new google.maps.LatLng(lat,lon);
+		// set bounds to zoom map to only current volunteer markers https://github.com/pilotsnpaws/pnp_maps/issues/24
+  		var bounds = new google.maps.LatLngBounds();
 
-				// is volunteer a foster or pilot, both, or neither?
-				// both foster and pilot
-				if ( (foster == '1') && (pilot == '1') ) 
-					{ var markerImage = 'images/icon_plane_house_small.svg' ;
-						var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
-					}
-				// just foster
-				else if (foster == '1') 
-					{ var markerImage = 'images/icon_house_small.svg' ; 
-					var pilotInfo = '';
-					}
-				// just pilot
-				else if (pilot == '1')
-					{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
-					var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
-					}
-				else  // then must be non-foster non-pilot volunteer
-					{ var markerImage = 'images/icon_volunteer.svg' ; 
-					var pilotInfo = '';
-					}
+		for (var i = 0; i < volunteers.length; i++) {
+			var username = volunteers[i].getAttribute("username");
+			var userID = volunteers[i].getAttribute("userID");
+			var lastVisit = volunteers[i].getAttribute("lastVisit");
+			var lastVisitHuman = volunteers[i].getAttribute("lastVisitHuman");
+			var foster = volunteers[i].getAttribute("foster");
+			var pilot = volunteers[i].getAttribute("pilot");
+			var flyingRadius= volunteers[i].getAttribute("flyingRadius");
+			var airportID = volunteers[i].getAttribute("airportID");
+			var airportName = volunteers[i].getAttribute("airportName");
+			var zip = volunteers[i].getAttribute("zip");
+			var lat = volunteers[i].getAttribute("lat") * (Math.random() * (max - min) + min);
+			var lon = volunteers[i].getAttribute("lon") * (Math.random() * (max - min) + min);
+			var city = volunteers[i].getAttribute("city");
+			var state = volunteers[i].getAttribute("state");
+			var volunteerCoordinates = new google.maps.LatLng(lat,lon);
 
-				var volunteerMarker = new google.maps.Marker({
-					position: volunteerCoordinates,
-					radius: flyingRadius * 1852, // 1852 meters in a nautical mile
-					icon: markerImage,
-					optimized: false,
-					html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +
-						'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-						' target="_blank" >' + username + '</a> <br>' +
-						' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
-						pilotInfo +
-						'Last visit: ' + lastVisitHuman +
-						'</div> ' ,
-					inboundHtml: '<a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
-						' target="_blank" >' + username + '</a>' ,
-					airportLink: '<a href="http://www.aopa.org/airports/' + airportID + '" target="_blank" >' + airportID + '</a>',
-					usernameForCopy: username + '<br>'
-					});  // end volunteerMarker
+			// https://github.com/pilotsnpaws/pnp_maps/issues/24
+			bounds.extend(volunteerCoordinates);
+
+			// is volunteer a foster or pilot, both, or neither?
+			// both foster and pilot
+			if ( (foster == '1') && (pilot == '1') ) 
+				{ var markerImage = 'images/icon_plane_house_small.svg' ;
+					var pilotInfo = 'Flying distance : <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br>'  ;
+				}
+			// just foster
+			else if (foster == '1') 
+				{ var markerImage = 'images/icon_house_small.svg' ; 
+				var pilotInfo = '';
+				}
+			// just pilot
+			else if (pilot == '1')
+				{ var markerImage = 'images/icon_plane_blue_small.svg' ; 
+				var pilotInfo = 'Flying distance: <b>' + flyingRadius + 'nm </b><br> Airport: <b>' + airportID + ' - ' + airportName + '</b><br> ' ;
+				}
+			else  // then must be non-foster non-pilot volunteer
+				{ var markerImage = 'images/icon_volunteer.svg' ; 
+				var pilotInfo = '';
+				}
+
+			var volunteerMarker = new google.maps.Marker({
+				position: volunteerCoordinates,
+				radius: flyingRadius * 1852, // 1852 meters in a nautical mile
+				icon: markerImage,
+				optimized: false,
+				html: '<div style=white-space:nowrap;margin:0 0 10px 10px;>' +
+					'Username: <a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+					' target="_blank" >' + username + '</a> <br>' +
+					' <img align="right" vertical-align="top" src="' + markerImage + '"> ' +
+					pilotInfo +
+					'Last visit: ' + lastVisitHuman +
+					'</div> ' ,
+				inboundHtml: '<a href=/forum/memberlist.php?mode=viewprofile&u=' + userID +
+					' target="_blank" >' + username + '</a>' ,
+				airportLink: '<a href="http://www.aopa.org/airports/' + airportID + '" target="_blank" >' + airportID + '</a>',
+				usernameForCopy: username + '<br>'
+				});  // end volunteerMarker
 
 
-				flightPaths.push(volunteerMarker);
-				// console.log('volunteerMarker pushed')
-				if( map.getBounds().contains(volunteerMarker.getPosition()) ){
-					    	inboundsCounter = inboundsCounter + 1;
-					    	// console.log('inboundsCounter: ' + inboundsCounter);
-					    	// console.log('flightPaths.length: ' + flightPaths.length);
-					    }
+			flightPaths.push(volunteerMarker);
+			// console.log('volunteerMarker pushed')
+			if( map.getBounds().contains(volunteerMarker.getPosition()) ){
+				    	inboundsCounter = inboundsCounter + 1;
+				    	// console.log('inboundsCounter: ' + inboundsCounter);
+				    	// console.log('flightPaths.length: ' + flightPaths.length);
+				    }
 
-				google.maps.event.addListener(volunteerMarker, 'click', function(event) {
-					// get the click's latlng and use that as anchor for infoWindow
-						var marker = new google.maps.Marker({
-							position: event.latLng,
-							map: map
-							});
+			google.maps.event.addListener(volunteerMarker, 'click', function(event) {
+				// get the click's latlng and use that as anchor for infoWindow
+					var marker = new google.maps.Marker({
+						position: event.latLng,
+						map: map
+						});
 
-					// set the info popup content as the html from polyline above, then open it
-						infoWindow.setContent(this.html);
-						infoWindow.open(map, marker);
+			// set the info popup content as the html from polyline above, then open it
+			infoWindow.setContent(this.html);
+			infoWindow.open(map, marker);
 
-					// setup the flying radius
-					var circleOptions = {
-						strokeColor: 'blue',
-						strokeOpacity: 0.5,
-						fillColor: 'green',
-						fillOpacity: 0.2,
-						map: map,
-						center: event.latLng,
-						radius: this.radius
-					} ;
+			// setup the flying radius
+			var circleOptions = {
+				strokeColor: 'blue',
+				strokeOpacity: 0.5,
+				fillColor: 'green',
+				fillOpacity: 0.2,
+				map: map,
+				center: event.latLng,
+				radius: this.radius
+			} ;
 
-					var flyingCircle = new google.maps.Circle(circleOptions);
+			var flyingCircle = new google.maps.Circle(circleOptions);
 
-					google.maps.event.addListener(map, 'click', function(event) {
-						flyingCircle.setMap(null) ; 
-						infoWindow.close(map, marker);
-						} );
-					google.maps.event.addListener(flyingCircle, 'click', function(event) {
-						flyingCircle.setMap(null) ; 
-						infoWindow.close(map, marker);
-						} );
+			google.maps.event.addListener(map, 'click', function(event) {
+				flyingCircle.setMap(null) ; 
+				infoWindow.close(map, marker);
+				} );
+			google.maps.event.addListener(flyingCircle, 'click', function(event) {
+				flyingCircle.setMap(null) ; 
+				infoWindow.close(map, marker);
+				} );
 
-					} ) ;
+				} ) ;
 
-				} // end of for
+			} // end of for
 
 			//  cluster the markers
 			var mcOptions = {
@@ -231,6 +239,16 @@
     			imagePath: 'https://cdn.rawgit.com/googlemaps/js-marker-clusterer/gh-pages/images/m' 
 				};
 			mc = new MarkerClusterer(map, flightPaths, mcOptions);
+
+			// https://github.com/pilotsnpaws/pnp_maps/issues/24
+			map.fitBounds(bounds);
+
+		// set zoom out to never show whole world, when volunteers are in HI and Guam for ex
+		// fixing https://github.com/pilotsnpaws/pnp_maps/issues/25
+			if (map.getZoom()<5) {
+				map.setZoom(5);
+				map.setCenter(centerOfUS); 
+			}
 
 			// commented out so we dont create a div with every volunteer on the map at startup 2016-05-20
 			// updateMappedVolunteers();

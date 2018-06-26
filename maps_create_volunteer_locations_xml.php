@@ -105,6 +105,7 @@ $query = 'select last_visit, last_visit_human, user_id, username, pf_foster_yn, 
 		. 'from vw_volunteers '
 		. 'where 1=1 '
 		. ' and user_inactive_reason = 0 /* include active only, exclude deactivated users */ '
+		. ' and lat is not null and lon is not null '
 		. ' and last_visit > date_add(cast(current_date as datetime), INTERVAL -'
 		. $lastVisitAge 
 		. ' DAY) and ' 
