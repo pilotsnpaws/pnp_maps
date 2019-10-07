@@ -77,12 +77,7 @@ if (mysqli_connect_errno())
     <br>
         <div id="optionsBox">
             <form method="GET" action="mapsmore_volunteersZip.php" id="searchform">
-            Search for pilots near zip code: <input type="text" name="zipCode" id="zipCode" maxlength="5" size="8" placeholder="Zip Code" value="<?
-
-    // prefill the field with the prior search
-    echo $zipCode ; 
-    
-    ?>"/>  
+            Search for pilots near zip code: <input type="text" name="zipCode" id="zipCode" maxlength="5" size="8" placeholder="Zip Code" value="<?php echo $zipCode;?>"/>  
             Radius to show:  
                 <select name="miles" id="miles">
                     <option selected="selected"> </option>
@@ -98,7 +93,7 @@ if (mysqli_connect_errno())
             </form>
         </div>
 
-<?
+<?php
 
     echo 'Showing pilots within ' . $miles . ' miles of zip code ' . $zipCode ;
     echo $lineBreak ; 
