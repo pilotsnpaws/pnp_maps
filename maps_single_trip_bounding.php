@@ -1,10 +1,10 @@
 <!DOCTYPE html >
   <head> 
-	<link rel="shortcut icon" href="https://www.pilotsnpaws.org/forum/favicon.ico" />
+	<link rel="shortcut icon" href="/favicon.ico" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org single trip map</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC58B4aQpLjLXUuNGonLJV9G0tP3BDMZJ4&libraries=geometry"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=UPDATE_KEY_HERE_TODO&libraries=geometry"></script>
     <script src="js/jquery.min.js" type="text/javascript"></script>
     <script src="js/clipboard.min.js" type="text/javascript"></script>
     <script type="text/javascript">

@@ -715,7 +715,7 @@ function removeFlightPaths() {
 
 </html>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC58B4aQpLjLXUuNGonLJV9G0tP3BDMZJ4&libraries=geometry&callback=initialize">
+<script src="https://maps.googleapis.com/maps/api/js?key=UPDATE_KEY_HERE_TODO&libraries=geometry&callback=initialize">
 </script>
 
 	<!-- Google analytics added 2016-03-29 --> 

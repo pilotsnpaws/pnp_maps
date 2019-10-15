@@ -4,13 +4,10 @@
 	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 	<title>Pilotsnpaws.org Volunteer Location Map</title>
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC58B4aQpLjLXUuNGonLJV9G0tP3BDMZJ4"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=UPDATE_KEY_HERE_TODO"></script>
 	<script src="js/markerclusterer.js" type="text/javascript"></script>
 	<script src="js/jquery.min.js" type="text/javascript"></script>
 	<script src="js/clipboard.min.js" type="text/javascript"></script>
-
-
-
     <script type="text/javascript">
     //<![CDATA[
 		

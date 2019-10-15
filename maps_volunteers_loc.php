@@ -1,9 +1,10 @@
 <!DOCTYPE html >
   <head>
+  	<link rel="shortcut icon" href="/favicon.ico" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <title>Pilotsnpaws.org Volunteer Location Map</title>
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyC58B4aQpLjLXUuNGonLJV9G0tP3BDMZJ4&sensor=false"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=UPDATE_KEY_HERE_TODO&sensor=false"></script>
     <script src="markerclusterer.js" type="text/javascript"></script>
     <script type="text/javascript">
     //<![CDATA[
