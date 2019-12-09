@@ -24,10 +24,12 @@ select
 	coalesce(a.city,convert(z.city using latin1)) AS city,
 	coalesce(a.state,convert(z.state using latin1)) AS state,
 	u.user_inactive_reason, 
-	u.user_type
+	u.user_type,
+    user_allow_viewemail, 
+    user_allow_massemail
 from phpbb_users u
 	join phpbb_profile_fields_data pf on u.user_id = pf.user_id
 	left join airports a on a.apt_id = pf.pf_airport_id
 	/* airport IDs are mixed case when user enters them, need to upper case occasionally, joining on UPPER is SLLLOOOW */
 	left join zipcodes z on z.zip = pf.pf_zip_code
-where 1=1
+where 1=1 ;
