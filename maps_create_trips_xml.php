@@ -30,12 +30,16 @@ function parseToXML($htmlStr)
   $xmlStr=str_replace('"','&quot;',$xmlStr); 
   $xmlStr=str_replace("'",'&#39;',$xmlStr); 
   $xmlStr=str_replace("&",'&amp;',$xmlStr); 
+// fix https://github.com/pilotsnpaws/pnp_maps/issues/28
+// might be able to remove the above manual ones from the past
+// mjg 2020-01-08
+  $xmlStr=htmlspecialchars($xmlStr);
   return $xmlStr; 
 } 
 
 
-//default the filter to return a year old posts if none provided via URL
-$lastPostAge = 365;
+//default the filter to return 30 day old posts if none provided via URL
+$lastPostAge = 30;
 
 // Get parameters from URL
 if (isset($_GET['lastPostAge'])){
