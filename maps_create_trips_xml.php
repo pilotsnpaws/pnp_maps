@@ -25,7 +25,8 @@ $server=$dbhost;
 
 function parseToXML($htmlStr) 
 { 
-  $xmlStr=str_replace('<','&lt;',$htmlStr); 
+  $xmlStr=$htmlStr;
+  $xmlStr=str_replace('<','&lt;',$xmlStr); 
   $xmlStr=str_replace('>','&gt;',$xmlStr); 
   $xmlStr=str_replace('"','&quot;',$xmlStr); 
   $xmlStr=str_replace("'",'&#39;',$xmlStr); 
@@ -33,7 +34,8 @@ function parseToXML($htmlStr)
 // fix https://github.com/pilotsnpaws/pnp_maps/issues/28
 // might be able to remove the above manual ones from the past
 // mjg 2020-01-08
-  $xmlStr=htmlspecialchars($xmlStr);
+//  $xmlStr=str_replace('—','-',$xmlStr);
+  $xmlStr=htmlspecialchars($xmlStr,ENT_IGNORE);
   return $xmlStr; 
 } 
 
