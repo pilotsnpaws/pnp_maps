@@ -79,7 +79,7 @@ if (mysqli_connect_errno())
     <br>
         <div id="optionsBox">
             <form method="GET" action="mapsmore_volunteersZipEmail.php" id="searchform">
-            Search for pilots near zip code: <input type="text" name="zipCode" id="zipCode" maxlength="5" size="8" placeholder="Zip Code" value="<?php  ?>
+            Search for pilots near zip code: <input type="text" name="zipCode" id="zipCode" maxlength="5" size="8" placeholder="Zip Code" value="<?php
 
     // prefill the field with the prior search
     echo $zipCode ; 
