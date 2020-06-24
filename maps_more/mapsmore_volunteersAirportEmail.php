@@ -78,7 +78,7 @@ if (mysqli_connect_errno())
     <br>
         <div id="optionsBox">
             <form method="GET" action="mapsmore_volunteersAirportEmail.php" id="searchform">
-            Search for pilots near airport: <input type="text" name="airportCode" id="airportCode" maxlength="4" size="11" placeholder="Airport Code" value="<?
+            Search for pilots near airport: <input type="text" name="airportCode" id="airportCode" maxlength="4" size="11" placeholder="Airport Code" value="<?php
 
     // prefill the field with the prior search
     echo $airportCode ; 
@@ -102,7 +102,7 @@ if (mysqli_connect_errno())
             </form>
         </div>
 
-<?
+<?php
 
     echo 'Showing pilots within ' . $miles . ' miles of airport code ' . $airportCode ;
     echo $lineBreak ; 
