@@ -17,3 +17,4 @@ config.php
 ca_dev/
 
 settings.php1
+.DS_Store
