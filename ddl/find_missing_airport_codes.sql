@@ -9,9 +9,9 @@ where user_type = 0
 	and p.pf_pilot_yn = 1
 	and p.pf_airport_id is not null 
     and p.pf_airport_id != ''
-    and a.apt_id is null and u.user_lastvisit > 1401675098
+    and a.apt_id is null and u.user_lastvisit > UNIX_TIMESTAMP(STR_TO_DATE('Jan 31 2020 10:00PM', '%M %d %Y %h:%i%p'))
 group by 2
-order by 1,2 desc
+order by 1,2 desc;
 
 -- add data with this
 INSERT INTO `airports`
@@ -24,7 +24,6 @@ INSERT INTO `airports`
 country_code)
 VALUES
 ('KBXM','Brunswick Executive', '43.8923551' ,'-69.9388297', 'Brunswick', 'ME', 'US' )
-
 ,
 ('T57','Garland/DFW Heloplex', '32.8876250' ,'-96.6836075', 'Garland', 'TX', 'US' )
 ;
