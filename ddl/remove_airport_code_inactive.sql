@@ -29,6 +29,20 @@ update prod_forum.phpbb_profile_fields_data
 			and user_regdate < UNIX_TIMESTAMP(STR_TO_DATE('Jan 31 2020 10:00PM', '%M %d %Y %h:%i%p'))
             );
             
+-- then zip codes too
+update prod_forum.phpbb_profile_fields_data
+set pf_zip_code = null
+where 1=1
+	and (pf_zip_code != '' and pf_zip_code is not null)
+	and user_id in (
+		select user_id 
+		from prod_forum.phpbb_users
+		where 1=1
+			and user_lastvisit < UNIX_TIMESTAMP(STR_TO_DATE('Jan 31 2020 10:00PM', '%M %d %Y %h:%i%p'))
+			and user_regdate < UNIX_TIMESTAMP(STR_TO_DATE('Jan 31 2020 10:00PM', '%M %d %Y %h:%i%p'))
+            )
+	and user_id < 100000;
+	    
 -- while we are here, should also set flying distance to 0 for old users
 -- see https://github.com/pilotsnpaws/pnp_maps/blob/master/ddl/set_flying_radius_0_old_users.sql
             
