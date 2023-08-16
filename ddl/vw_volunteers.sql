@@ -26,7 +26,8 @@ select
 	u.user_inactive_reason, 
 	u.user_type,
     user_allow_viewemail, 
-    user_allow_massemail
+    user_allow_massemail,
+    pf.pf_show_on_map
 from phpbb_users u
 	join phpbb_profile_fields_data pf on u.user_id = pf.user_id
 	left join airports a on a.apt_id = pf.pf_airport_id
