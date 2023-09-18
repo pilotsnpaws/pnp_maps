@@ -222,11 +222,11 @@ function removeFlightPaths() {
 	<div id="optionsBox">
 		Filter by recent activity:
 		<select id="lastPostAge">
-			<option value="0" selected>Today only</option>
-			<option value="3" selected="selected">In the last 3 days</option>
+			<option value="0">Today only</option>
+			<option value="3">In the last 3 days</option>
 			<option value="5">In the last 5 days</option>
 			<option value="7">In the last 7 days</option>
-			<option value="14">In the last 14 days</option>
+			<option value="14" selected="selected">In the last 14 days</option>
 			<option value="30">In the last 30 days</option>
 			<option value="365">Last 12 months</option>
 		</select>
