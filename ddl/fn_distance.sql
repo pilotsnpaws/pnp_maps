@@ -1,3 +1,14 @@
+/* 
+Created 2016
+Last updated 2023 for documentation only. 
+
+This function accepts a pair of lat/lon and returns the distance between them, in miles
+Example usage:
+select fn_distance(39.588972, -84.224861, 39.600056, -84.416611)
+
+This is required in the PNP DB prod_forum in order for views, notifications, and maps to work
+*/
+
 DROP FUNCTION fn_distance;
 
 DELIMITER $$
@@ -19,7 +30,4 @@ END
 
 DELIMITER ;
 
-select fn_distance(39.588972, -84.224861, 39.600056, -84.416611)
 
-ck the manual that corresponds to your MySQL server version 
-for the right syntax to use near '' at line 6
