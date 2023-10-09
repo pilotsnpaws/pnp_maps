@@ -17,10 +17,7 @@ WHERE
   1 = 1
   AND apts.apt_id = 'KBJC'
   AND last_post BETWEEN '2022-06-01' AND '2030-01-01'
-  AND (
-    trip_status = 'Done'
-    OR forum_id = '8'
-  ) # done trip forum is forum_id = 8
+  AND TRIM(CAST(trip_status AS CHAR(25))) = 'Done'
   AND (
     prod_forum.fn_distance (trips.sendLat, trips.sendLon, apts.lat, apts.lon) < 50
     OR prod_forum.fn_distance (trips.recLat, trips.recLon, apts.lat, apts.lon) < 50
