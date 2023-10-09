@@ -7,8 +7,8 @@ where pf_flying_radius > 0
 and user_id IN
 (select u.user_id from phpbb_users u 
 where 1=1
-	and user_lastvisit < UNIX_TIMESTAMP(STR_TO_DATE('Jul 01 2022 10:00PM', '%M %d %Y %h:%i%p'))
-	and user_regdate < UNIX_TIMESTAMP(STR_TO_DATE('Jan 01 2023 10:00PM', '%M %d %Y %h:%i%p'))
+	and user_lastvisit 	< UNIX_TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP, INTERVAL -13 MONTH))
+	and user_regdate 	< UNIX_TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP, INTERVAL -13 MONTH))
 	)
 order by user_id desc;
 
@@ -19,6 +19,6 @@ update phpbb_profile_fields_data
 		and user_id IN
 			(select u.user_id from phpbb_users u 
 			where 1=1
-				and user_lastvisit < UNIX_TIMESTAMP(STR_TO_DATE('Jul 01 2022 10:00PM', '%M %d %Y %h:%i%p'))
-				  and user_regdate < UNIX_TIMESTAMP(STR_TO_DATE('Jan 01 2023 10:00PM', '%M %d %Y %h:%i%p'))
-			  );
+				and user_lastvisit 	< UNIX_TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP, INTERVAL -13 MONTH))
+				and user_regdate 	< UNIX_TIMESTAMP(DATE_ADD(CURRENT_TIMESTAMP, INTERVAL -13 MONTH))
+	);
