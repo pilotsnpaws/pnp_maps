@@ -684,7 +684,9 @@ function removeFlightPaths() {
 			<option value="90" selected="selected">3 months</option>
 			<option value="180">6 months</option>
 			<option value="365">1 year</option>
-			<option value="3650">Show me all volunteers</option>
+			<!-- 2023-10-09 MJG removed to prevent spamming non-active users
+			<option value="3650">Show me all volunteers</option> 
+			--> 
 		</select>
 		<br>
 		Radius to show:  
