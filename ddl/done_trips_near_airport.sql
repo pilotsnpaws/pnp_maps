@@ -6,15 +6,22 @@ are either marked done or in the done forum
 
 */
 
-select trips.*, 
-	prod_forum.fn_distance(trips.sendLat, trips.sendLon, apts.lat, apts.lon) as distSendingNearAirport,
-    prod_forum.fn_distance(trips.recLat, trips.recLon, apts.lat, apts.lon) as distReceivingNearAirport
-from prod_forum.vw_lines trips
-	, prod_forum.airports apts
-where 1=1
-	and apts.apt_id = 'KBJC'
-	and last_post BETWEEN '2020-10-01' and '2030-01-01'
-	and (trip_status = 'Done' or forum_id = 8) # done trip forum is forum_id = 8
-	and ( prod_forum.fn_distance(trips.sendLat, trips.sendLon, apts.lat, apts.lon) < 50
-			or prod_forum.fn_distance(trips.recLat, trips.recLon, apts.lat, apts.lon) < 50)
-    ;
+SELECT
+  trips.*,
+  prod_forum.fn_distance (trips.sendLat, trips.sendLon, apts.lat, apts.lon) AS distSendingNearAirport,
+  prod_forum.fn_distance (trips.recLat, trips.recLon, apts.lat, apts.lon) AS distReceivingNearAirport
+FROM
+  prod_forum.vw_lines trips,
+  prod_forum.airports apts
+WHERE
+  1 = 1
+  AND apts.apt_id = 'KBJC'
+  AND last_post BETWEEN '2022-06-01' AND '2030-01-01'
+  AND (
+    trip_status = 'Done'
+    OR forum_id = '8'
+  ) # done trip forum is forum_id = 8
+  AND (
+    prod_forum.fn_distance (trips.sendLat, trips.sendLon, apts.lat, apts.lon) < 50
+    OR prod_forum.fn_distance (trips.recLat, trips.recLon, apts.lat, apts.lon) < 50
+  );
